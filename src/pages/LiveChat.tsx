@@ -3,10 +3,11 @@ import { Video, VideoOff, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
-import ControlPanel from "@/components/ControlPanel";
+import ControlPanel, { COUNTRIES, type Gender, type Country } from "@/components/ControlPanel";
+import MatchRevealOverlay from "@/components/MatchRevealOverlay";
 
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
-type ConnectionState = "searching" | "connected";
+type ConnectionState = "searching" | "revealing" | "connected";
 
 export default function LiveChat() {
   const navigate = useNavigate();
@@ -22,6 +23,12 @@ export default function LiveChat() {
   const [input, setInput] = useState("");
   const [searchDots, setSearchDots] = useState("");
   const [remoteVisible, setRemoteVisible] = useState(false);
+  const [gender, setGender] = useState<Gender>("boy");
+  const [country, setCountry] = useState<Country>(COUNTRIES[COUNTRIES.length - 1]);
+
+  // Simulated match data
+  const [matchCountry, setMatchCountry] = useState<Country>(COUNTRIES[0]);
+  const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
 
   const chatEnabled = connectionState === "connected";
 
@@ -60,15 +67,24 @@ export default function LiveChat() {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
   }, []);
 
+  const handleRevealComplete = useCallback(() => {
+    setConnectionState("connected");
+    setRemoteVisible(true);
+  }, []);
+
   const simulateMatch = useCallback(() => {
     setConnectionState("searching");
     clearRemote();
     setMessages([{ text: "Looking for someone…", sender: "system" }]);
 
+    // Pick a random match country and gender
+    const randomCountry = COUNTRIES[Math.floor(Math.random() * (COUNTRIES.length - 1))];
+    const randomGender = Math.random() > 0.5 ? "boy" as const : "girl" as const;
+
     setTimeout(() => {
-      setConnectionState("connected");
-      setMessages((m) => [...m, { text: "Connected! Say hello 👋", sender: "system" }]);
-      setRemoteVisible(true);
+      setMatchCountry(randomCountry);
+      setMatchGender(randomGender);
+      setConnectionState("revealing");
     }, 3000);
   }, [clearRemote]);
 
@@ -129,6 +145,14 @@ export default function LiveChat() {
 
       {/* Video Section */}
       <div className="flex-1 flex relative min-h-0" style={{ maxHeight: "78vh" }}>
+        {/* Match Reveal Overlay */}
+        <MatchRevealOverlay
+          visible={connectionState === "revealing"}
+          country={matchCountry}
+          gender={matchGender}
+          onRevealComplete={handleRevealComplete}
+        />
+
         {/* Remote Video — Left (Stranger) */}
         <div className="w-1/2 relative bg-muted/20 overflow-hidden">
           <video
@@ -213,6 +237,10 @@ export default function LiveChat() {
         micOn={micOn}
         onToggleCamera={toggleCamera}
         onToggleMic={toggleMic}
+        gender={gender}
+        onGenderChange={setGender}
+        country={country}
+        onCountryChange={setCountry}
       />
 
       {/* Chat Section */}
