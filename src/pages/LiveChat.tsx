@@ -258,8 +258,8 @@ export default function LiveChat() {
             onClick={handleNext}
             className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
               bg-primary text-primary-foreground
-              shadow-[0_2px_16px_hsl(var(--primary)/0.35)]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_24px_hsl(var(--primary)/0.45)] hover:brightness-110
+              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)]
+              hover:-translate-y-0.5 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] hover:brightness-110
               active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
               transition-all duration-200 ease-out"
           >
@@ -270,10 +270,10 @@ export default function LiveChat() {
           <button
             onClick={handleEnd}
             className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
-              bg-destructive/80 text-destructive-foreground
-              shadow-[0_2px_12px_hsl(var(--destructive)/0.25)]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
-              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--destructive)/0.2)]
+              bg-primary text-primary-foreground
+              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)]
+              hover:-translate-y-0.5 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] hover:brightness-110
+              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
               transition-all duration-200 ease-out"
           >
             Stop
@@ -283,10 +283,10 @@ export default function LiveChat() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((o) => !o)}
-              className="h-16 w-28 rounded-xl bg-primary/80 text-primary-foreground flex flex-col items-center justify-center gap-1
-                shadow-[0_2px_12px_hsl(var(--primary)/0.2)] border border-primary/30
-                hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)]
-                active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--primary)/0.15)]
+              className="h-16 w-28 rounded-xl bg-primary text-primary-foreground flex flex-col items-center justify-center gap-1
+                shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] border border-primary/30
+                hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)]
+                active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
                 transition-all duration-200 ease-out"
             >
               <span className="text-2xl leading-none">{country.flag}</span>
@@ -313,10 +313,10 @@ export default function LiveChat() {
           {/* Gender */}
           <button
             onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
-            className="h-16 w-28 rounded-xl bg-primary/80 text-primary-foreground flex flex-col items-center justify-center gap-1
-              shadow-[0_2px_12px_hsl(var(--primary)/0.2)] border border-primary/30
-              hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)]
-              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--primary)/0.15)]
+            className="h-16 w-28 rounded-xl bg-primary text-primary-foreground flex flex-col items-center justify-center gap-1
+              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] border border-primary/30
+              hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)]
+              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
               transition-all duration-200 ease-out"
           >
             <span className="text-2xl leading-none">{gender === "boy" ? "👦" : "👧"}</span>
@@ -331,7 +331,7 @@ export default function LiveChat() {
               border transition-all duration-200 ease-out
               ${!cameraOn
                 ? "bg-destructive/20 text-destructive border-destructive/30"
-                : "bg-primary/80 text-primary-foreground border-primary/30 shadow-[0_2px_12px_hsl(var(--primary)/0.2)] hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)] active:translate-y-0 active:scale-[0.97]"
+                : "bg-primary text-primary-foreground border-primary/30 shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] active:translate-y-0 active:scale-[0.97]"
               }`}
           >
             {cameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
@@ -345,7 +345,7 @@ export default function LiveChat() {
               border transition-all duration-200 ease-out
               ${!micOn
                 ? "bg-destructive/20 text-destructive border-destructive/30"
-                : "bg-primary/80 text-primary-foreground border-primary/30 shadow-[0_2px_12px_hsl(var(--primary)/0.2)] hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)] active:translate-y-0 active:scale-[0.97]"
+                : "bg-primary text-primary-foreground border-primary/30 shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] active:translate-y-0 active:scale-[0.97]"
               }`}
           >
             {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
@@ -360,8 +360,8 @@ export default function LiveChat() {
           neon-chat-box ${messages.length > 0 ? "neon-pulse" : ""}`}
       >
         {/* Chat header */}
-        <div className="px-5 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
-          <span className="w-2 h-2 rounded-full bg-[hsl(330_90%_60%)] animate-pulse shrink-0" />
+        <div className="px-5 py-2 border-b border-primary/15 flex items-center gap-2 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
           <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Chat</span>
         </div>
 
@@ -394,7 +394,7 @@ export default function LiveChat() {
         </div>
 
         {/* Pinned input — neon orange */}
-        <div className="px-5 py-2.5 border-t border-[hsl(25_90%_45%/0.25)] flex items-center gap-3 shrink-0">
+        <div className="px-5 py-2.5 border-t border-primary/25 flex items-center gap-3 shrink-0">
           <input
             value={input}
             onChange={(e) => chatEnabled && setInput(e.target.value)}
@@ -403,7 +403,7 @@ export default function LiveChat() {
             placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
             className={`flex-1 rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none transition-all duration-300 ${
               chatEnabled
-                ? "bg-[hsl(25_60%_10%)] text-[hsl(25_90%_85%)] border-2 border-[hsl(25_90%_50%/0.7)] placeholder:text-[hsl(25_80%_55%/0.8)] shadow-[inset_0_0_10px_hsl(25_90%_40%/0.15)] focus:border-[hsl(25_95%_55%)] focus:shadow-[0_0_14px_hsl(25_90%_50%/0.35),inset_0_0_10px_hsl(25_90%_40%/0.15)]"
+                ? "bg-[hsl(180_50%_8%)] text-[hsl(180_80%_85%)] border-2 border-primary/70 placeholder:text-primary/60 shadow-[inset_0_0_10px_hsl(var(--primary)/0.15),0_0_8px_hsl(var(--primary)/0.2)] focus:border-primary focus:shadow-[0_0_18px_hsl(var(--primary)/0.45),inset_0_0_10px_hsl(var(--primary)/0.15)]"
                 : "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"
             }`}
           />
@@ -412,7 +412,7 @@ export default function LiveChat() {
             disabled={!chatEnabled}
             className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
               chatEnabled
-                ? "bg-[hsl(25_90%_50%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_12px_hsl(25_90%_50%/0.4)]"
+                ? "bg-primary text-primary-foreground hover:scale-110 shadow-[0_0_16px_hsl(var(--primary)/0.5)]"
                 : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
             }`}
           >
