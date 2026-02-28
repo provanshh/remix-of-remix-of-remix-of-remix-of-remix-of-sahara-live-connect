@@ -367,42 +367,46 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* ═══ Slim Chat Bar ═══ */}
+      {/* ═══ Chat Panel ═══ */}
       <div
-        className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-500 ${
+        className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-500 flex flex-col ${
           chatEnabled
             ? "shadow-[0_-1px_20px_hsl(var(--glow-primary)/0.08)]"
             : ""
         }`}
       >
-        <div className="flex items-center gap-2 px-4 py-2.5 bg-background/80 backdrop-blur-xl border-t border-border/10">
-          {/* Messages preview */}
-          <div className="flex-1 flex items-center gap-3 min-w-0">
-            {messages.length > 0 && (
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <div className="flex items-center gap-2">
-                  {messages[messages.length - 1].sender === "system" ? (
-                    <span className="text-[11px] text-muted-foreground/50 italic truncate">
-                      {messages[messages.length - 1].text}
-                    </span>
-                  ) : (
-                    <span
-                      className={`text-[11px] truncate px-2 py-0.5 rounded-full ${
-                        messages[messages.length - 1].sender === "me"
-                          ? "gradient-primary text-primary-foreground"
-                          : "glass text-foreground"
-                      }`}
-                    >
-                      {messages[messages.length - 1].text}
-                    </span>
-                  )}
-                </div>
+        {/* Chat history */}
+        {messages.length > 0 && (
+          <div className="max-h-44 overflow-y-auto px-4 pt-3 pb-1 bg-background/70 backdrop-blur-xl border-t border-border/10 space-y-1.5 scrollbar-thin">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
+              >
+                {msg.sender === "system" ? (
+                  <span className="text-[11px] text-muted-foreground/50 italic">
+                    {msg.text}
+                  </span>
+                ) : (
+                  <span
+                    className={`text-[12px] px-3 py-1 rounded-2xl max-w-[70%] break-words ${
+                      msg.sender === "me"
+                        ? "gradient-primary text-primary-foreground rounded-br-sm"
+                        : "bg-muted/60 text-foreground rounded-bl-sm"
+                    }`}
+                  >
+                    {msg.text}
+                  </span>
+                )}
               </div>
-            )}
+            ))}
+            <div ref={chatEndRef} />
           </div>
+        )}
 
-          {/* Input */}
-          <div className="flex items-center gap-2 max-w-md w-full">
+        {/* Input bar */}
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-background/80 backdrop-blur-xl border-t border-border/10">
+          <div className="flex items-center gap-2 w-full">
             <input
               value={input}
               onChange={(e) => chatEnabled && setInput(e.target.value)}
@@ -428,7 +432,6 @@ export default function LiveChat() {
             </button>
           </div>
         </div>
-        <div ref={chatEndRef} />
       </div>
     </div>
   );
