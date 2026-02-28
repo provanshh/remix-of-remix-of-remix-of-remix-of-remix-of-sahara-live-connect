@@ -13,10 +13,10 @@ function randomInRange(min: number, max: number) {
 
 function getRandomStats(): StatItem[] {
   return [
-    { label: "Active Users Online", value: randomInRange(8000, 18000), prefix: "" },
-    { label: "Connections Today", value: randomInRange(150000, 400000), prefix: "" },
-    { label: "Avg Match Time", value: randomInRange(2, 5), suffix: "s" },
-    { label: "Countries Connected", value: randomInRange(120, 190), prefix: "" },
+    { label: "Active Users Online", value: randomInRange(12800, 12900), prefix: "" },
+    { label: "Connections Today", value: randomInRange(284550, 284650), prefix: "" },
+    { label: "Avg Match Time", value: randomInRange(3, 4), suffix: "s" },
+    { label: "Countries Connected", value: randomInRange(140, 145), prefix: "" },
   ];
 }
 
