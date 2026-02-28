@@ -204,23 +204,16 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* Controls Bar */}
-      <div className="flex items-center justify-center py-2.5 border-t border-border/20">
-        <div className="glass-strong rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <ControlBtn onClick={handleNext} active={false} accent title="Next">
-            <SkipForward className="w-4 h-4" />
-          </ControlBtn>
-          <ControlBtn onClick={toggleCamera} active={!cameraOn} title={cameraOn ? "Turn off camera" : "Turn on camera"}>
-            {cameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-          </ControlBtn>
-          <ControlBtn onClick={toggleMic} active={!micOn} title={micOn ? "Mute" : "Unmute"}>
-            {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-          </ControlBtn>
-          <ControlBtn onClick={handleEnd} active={false} danger title="Stop">
-            <PhoneOff className="w-4 h-4" />
-          </ControlBtn>
-        </div>
-      </div>
+      {/* Control Panel */}
+      <ControlPanel
+        isConnected={chatEnabled}
+        onStart={handleNext}
+        onStop={handleEnd}
+        cameraOn={cameraOn}
+        micOn={micOn}
+        onToggleCamera={toggleCamera}
+        onToggleMic={toggleMic}
+      />
 
       {/* Chat Section */}
       <div
