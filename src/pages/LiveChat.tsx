@@ -383,26 +383,26 @@ export default function LiveChat() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Pinned input */}
-        <div className="px-5 py-2 border-t border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
+        {/* Pinned input — neon orange */}
+        <div className="px-5 py-2.5 border-t border-[hsl(25_90%_45%/0.25)] flex items-center gap-3 shrink-0">
           <input
             value={input}
             onChange={(e) => chatEnabled && setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={!chatEnabled}
             placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
-            className={`flex-1 border-none rounded-full px-4 py-2 text-xs placeholder:text-muted-foreground/40 focus:outline-none transition-all duration-300 ${
+            className={`flex-1 rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none transition-all duration-300 ${
               chatEnabled
-                ? "bg-muted/40 text-foreground focus:ring-1 focus:ring-[hsl(330_90%_60%/0.4)]"
-                : "bg-muted/15 text-muted-foreground/20 opacity-40 cursor-not-allowed"
+                ? "bg-[hsl(25_60%_10%)] text-[hsl(25_90%_85%)] border-2 border-[hsl(25_90%_50%/0.7)] placeholder:text-[hsl(25_80%_55%/0.8)] shadow-[inset_0_0_10px_hsl(25_90%_40%/0.15)] focus:border-[hsl(25_95%_55%)] focus:shadow-[0_0_14px_hsl(25_90%_50%/0.35),inset_0_0_10px_hsl(25_90%_40%/0.15)]"
+                : "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"
             }`}
           />
           <button
             onClick={handleSend}
             disabled={!chatEnabled}
-            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
               chatEnabled
-                ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_10px_hsl(330_90%_60%/0.3)]"
+                ? "bg-[hsl(25_90%_50%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_12px_hsl(25_90%_50%/0.4)]"
                 : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
             }`}
           >
