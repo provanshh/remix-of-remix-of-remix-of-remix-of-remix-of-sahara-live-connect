@@ -145,10 +145,10 @@
   }
 
   .neon-chat-box {
-    border: 1.5px solid hsl(330 90% 60% / 0.6);
-    box-shadow: 0 0 12px hsl(330 90% 60% / 0.2),
-                0 0 30px hsl(330 90% 60% / 0.08),
-                inset 0 0 12px hsl(330 90% 60% / 0.03);
+    border: 1.5px solid hsl(var(--primary) / 0.6);
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.2),
+                0 0 30px hsl(var(--primary) / 0.08),
+                inset 0 0 12px hsl(var(--primary) / 0.03);
   }
 
   .neon-chat-box.neon-pulse {
@@ -166,14 +166,14 @@
     background: transparent;
   }
   .chat-scrollbar::-webkit-scrollbar-thumb {
-    background: hsl(330 90% 60% / 0.25);
+    background: hsl(var(--primary) / 0.25);
     border-radius: 10px;
   }
 }
 
 @keyframes neon-border-pulse {
-  0% { box-shadow: 0 0 12px hsl(330 90% 60% / 0.5), 0 0 40px hsl(330 90% 60% / 0.25); }
-  100% { box-shadow: 0 0 12px hsl(330 90% 60% / 0.2), 0 0 30px hsl(330 90% 60% / 0.08); }
+  0% { box-shadow: 0 0 12px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.25); }
+  100% { box-shadow: 0 0 12px hsl(var(--primary) / 0.2), 0 0 30px hsl(var(--primary) / 0.08); }
 }
 
 @keyframes chat-fade-in {
