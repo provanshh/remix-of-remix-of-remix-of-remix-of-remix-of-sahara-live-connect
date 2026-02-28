@@ -284,37 +284,3 @@ export default function LiveChat() {
     </div>
   );
 }
-
-function ControlBtn({
-  children,
-  onClick,
-  active,
-  accent,
-  danger,
-  title,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-  accent?: boolean;
-  danger?: boolean;
-  title?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
-        danger
-          ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
-          : accent
-          ? "text-primary hover:bg-primary/10"
-          : active
-          ? "bg-destructive/20 text-destructive"
-          : "text-foreground/70 hover:text-foreground hover:bg-muted/50"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
