@@ -343,70 +343,71 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* ═══ Chat Panel ═══ */}
+      {/* ═══ Premium Neon Chat Box ═══ */}
       <div
-        className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-500 flex flex-col ${
-          chatEnabled
-            ? "shadow-[0_-1px_20px_hsl(var(--glow-primary)/0.08)]"
-            : ""
-        }`}
+        className={`absolute bottom-2 right-3 z-30 w-80 h-64 rounded-2xl overflow-hidden flex flex-col
+          bg-background/90 backdrop-blur-2xl transition-all duration-500
+          neon-chat-box ${messages.length > 0 ? "neon-pulse" : ""}`}
       >
-        {/* Chat history */}
-        {messages.length > 0 && (
-          <div className="max-h-44 overflow-y-auto px-4 pt-3 pb-1 bg-background/70 backdrop-blur-xl border-t border-border/10 space-y-1.5 scrollbar-thin">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
-              >
-                {msg.sender === "system" ? (
-                  <span className="text-[11px] text-muted-foreground/50 italic">
-                    {msg.text}
-                  </span>
-                ) : (
-                  <span
-                    className={`text-[12px] px-3 py-1 rounded-2xl max-w-[70%] break-words ${
-                      msg.sender === "me"
-                        ? "gradient-primary text-primary-foreground rounded-br-sm"
-                        : "bg-muted/60 text-foreground rounded-bl-sm"
-                    }`}
-                  >
-                    {msg.text}
-                  </span>
-                )}
-              </div>
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-        )}
+        {/* Chat header */}
+        <div className="px-4 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[hsl(330_90%_60%)] animate-pulse shrink-0" />
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Chat</span>
+        </div>
 
-        {/* Input bar */}
-        <div className="flex items-center gap-2 px-4 py-2.5 bg-background/80 backdrop-blur-xl border-t border-border/10">
-          <div className="flex items-center gap-2 w-full">
-            <input
-              value={input}
-              onChange={(e) => chatEnabled && setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              disabled={!chatEnabled}
-              placeholder={chatEnabled ? "Type a message…" : "Chat activates on connect…"}
-              className={`flex-1 border-none rounded-full px-4 py-2 text-xs placeholder:text-muted-foreground/40 focus:outline-none transition-all duration-500 ${
-                chatEnabled
-                  ? "bg-muted/50 text-foreground focus:ring-1 focus:ring-ring/30"
-                  : "bg-muted/15 text-muted-foreground/20 opacity-40 cursor-not-allowed"
-              }`}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!chatEnabled}
-              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
-                chatEnabled
-                  ? "gradient-primary text-primary-foreground hover:scale-105 shadow-[0_0_12px_hsl(var(--glow-primary)/0.2)]"
-                  : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
-              }`}
+        {/* Scrollable messages */}
+        <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-3 py-2 space-y-1.5">
+          {messages.length === 0 && (
+            <p className="text-[11px] text-muted-foreground/30 text-center mt-8 italic">No messages yet</p>
+          )}
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
             >
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </div>
+              {msg.sender === "system" ? (
+                <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
+              ) : (
+                <span
+                  className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[80%] break-words ${
+                    msg.sender === "me"
+                      ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] rounded-br-sm"
+                      : "bg-muted/60 text-foreground rounded-bl-sm"
+                  }`}
+                >
+                  {msg.text}
+                </span>
+              )}
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Pinned input */}
+        <div className="px-3 py-2 border-t border-[hsl(330_90%_60%/0.15)] flex items-center gap-2">
+          <input
+            value={input}
+            onChange={(e) => chatEnabled && setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            disabled={!chatEnabled}
+            placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
+            className={`flex-1 border-none rounded-full px-3 py-1.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none transition-all duration-300 ${
+              chatEnabled
+                ? "bg-muted/40 text-foreground focus:ring-1 focus:ring-[hsl(330_90%_60%/0.4)]"
+                : "bg-muted/15 text-muted-foreground/20 opacity-40 cursor-not-allowed"
+            }`}
+          />
+          <button
+            onClick={handleSend}
+            disabled={!chatEnabled}
+            className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+              chatEnabled
+                ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_10px_hsl(330_90%_60%/0.3)]"
+                : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
+            }`}
+          >
+            <Send className="w-3 h-3" />
+          </button>
         </div>
       </div>
     </div>
