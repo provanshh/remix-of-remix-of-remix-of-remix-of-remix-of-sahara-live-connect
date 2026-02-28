@@ -222,7 +222,7 @@ export default function LiveChat() {
 
           {/* Left bottom: control dock */}
           <div className="shrink-0 px-2 py-2">
-            <div className="flex items-stretch gap-1.5">
+            <div className="flex items-stretch gap-1.5 bg-[sidebar-accent-foreground] bg-primary-foreground text-primary-foreground">
               {/* Start/Next */}
               <button
                 onClick={handleNext}
@@ -309,14 +309,14 @@ export default function LiveChat() {
               </button>
 
               {/* Chat */}
-              <button
-                onClick={() => chatInputRef.current?.focus()}
-                title="Open chat"
-                className="h-14 w-14 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
-                  bg-muted/80 text-foreground hover:bg-muted">
+              
 
-                
-              </button>
+
+
+
+
+
+
             </div>
           </div>
         </div>
