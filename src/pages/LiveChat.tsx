@@ -250,17 +250,13 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* ═══ Floating Control Dock ═══ */}
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-40">
-        {/* Neon underline glow */}
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[120%] h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[80%] h-4 bg-primary/5 blur-xl rounded-full" />
-
-        <div className="glass-strong rounded-2xl px-2 py-2 flex items-center gap-1.5 shadow-[0_8px_40px_hsl(var(--glow-primary)/0.1),0_2px_12px_rgba(0,0,0,0.3)]">
-          {/* Next */}
+      {/* ═══ Control Dock ═══ */}
+      <div className="absolute bottom-16 left-0 z-40 px-2 w-auto">
+        <div className="flex items-stretch gap-1.5">
+          {/* Start/Next */}
           <button
             onClick={handleNext}
-            className="h-11 px-6 rounded-xl font-display font-semibold text-sm tracking-tight
+            className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
               bg-[hsl(142_70%_42%)] text-[hsl(0_0%_100%)]
               shadow-[0_2px_16px_hsl(142_70%_42%/0.35)]
               hover:shadow-[0_4px_24px_hsl(142_70%_42%/0.5)] hover:brightness-110
@@ -272,7 +268,7 @@ export default function LiveChat() {
           {/* Stop */}
           <button
             onClick={handleEnd}
-            className="h-11 px-6 rounded-xl font-display font-semibold text-sm tracking-tight
+            className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
               bg-destructive/80 text-destructive-foreground
               shadow-[0_2px_12px_hsl(var(--destructive)/0.25)]
               hover:shadow-[0_4px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
@@ -281,47 +277,15 @@ export default function LiveChat() {
             Stop
           </button>
 
-          {/* Separator */}
-          <div className="w-px h-7 bg-border/20 mx-0.5" />
-
-          {/* Camera */}
-          <button
-            onClick={toggleCamera}
-            title={cameraOn ? "Turn off camera" : "Turn on camera"}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
-              ${!cameraOn
-                ? "bg-destructive/20 text-destructive shadow-[0_0_10px_hsl(var(--destructive)/0.2)]"
-                : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80"
-              }`}
-          >
-            {cameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-          </button>
-
-          {/* Mic */}
-          <button
-            onClick={toggleMic}
-            title={micOn ? "Mute" : "Unmute"}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
-              ${!micOn
-                ? "bg-destructive/20 text-destructive shadow-[0_0_10px_hsl(var(--destructive)/0.2)]"
-                : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80"
-              }`}
-          >
-            {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-          </button>
-
-          {/* Separator */}
-          <div className="w-px h-7 bg-border/20 mx-0.5" />
-
           {/* Country */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((o) => !o)}
-              className="h-10 rounded-xl bg-secondary/60 text-secondary-foreground flex items-center gap-1.5 px-3 hover:bg-secondary/80 transition-all duration-200"
+              className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
+                hover:bg-muted transition-all duration-200 border border-border/20"
             >
-              <span className="text-base leading-none">{country.flag}</span>
-              <span className="text-xs font-medium hidden sm:inline">{country.name}</span>
-              <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
+              <span className="text-2xl leading-none">{country.flag}</span>
+              <span className="text-[11px] font-medium text-muted-foreground">Country</span>
             </button>
             {dropdownOpen && (
               <div className="absolute bottom-full mb-2 left-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
@@ -342,28 +306,40 @@ export default function LiveChat() {
           </div>
 
           {/* Gender */}
-          <div className="h-10 rounded-xl bg-secondary/60 flex items-center p-0.5 gap-0.5">
-            <button
-              onClick={() => setGender("boy")}
-              className={`h-full px-3 rounded-lg text-sm font-medium flex items-center gap-1 transition-all duration-300
-                ${gender === "boy"
-                  ? "bg-primary/15 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.2)]"
-                  : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              <span className="text-sm">👦</span>
-            </button>
-            <button
-              onClick={() => setGender("girl")}
-              className={`h-full px-3 rounded-lg text-sm font-medium flex items-center gap-1 transition-all duration-300
-                ${gender === "girl"
-                  ? "bg-[hsl(330_70%_50%/0.15)] text-[hsl(330_70%_55%)] shadow-[0_0_10px_hsl(330_70%_50%/0.2)]"
-                  : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              <span className="text-sm">👧</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
+            className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
+              hover:bg-muted transition-all duration-200 border border-border/20"
+          >
+            <span className="text-2xl leading-none">{gender === "boy" ? "👦" : "👧"}</span>
+            <span className="text-[11px] font-medium text-muted-foreground">I am</span>
+          </button>
+
+          {/* Camera */}
+          <button
+            onClick={toggleCamera}
+            title={cameraOn ? "Turn off camera" : "Turn on camera"}
+            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
+              ${!cameraOn
+                ? "bg-destructive/20 text-destructive"
+                : "bg-muted/80 text-foreground hover:bg-muted"
+              }`}
+          >
+            {cameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+          </button>
+
+          {/* Mic */}
+          <button
+            onClick={toggleMic}
+            title={micOn ? "Mute" : "Unmute"}
+            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
+              ${!micOn
+                ? "bg-destructive/20 text-destructive"
+                : "bg-muted/80 text-foreground hover:bg-muted"
+              }`}
+          >
+            {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          </button>
         </div>
       </div>
 
