@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook } from "lucide-react";
+import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook, LogIn } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
-import FloatingProfiles from "@/components/FloatingProfiles";
+import ParticleBackground from "@/components/ParticleBackground";
+import ProfileCard from "@/components/ProfileCard";
 import StatsCounter from "@/components/StatsCounter";
 
 import profile1 from "@/assets/profile-1.jpg";
@@ -41,10 +42,10 @@ export default function LandingPage() {
   const [genderOpen, setGenderOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [onlineCount, setOnlineCount] = useState(179545);
-  const [scrollY, setScrollY] = useState(0);
   const genderRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
 
+  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (genderRef.current && !genderRef.current.contains(e.target as Node)) setGenderOpen(false);
@@ -54,6 +55,7 @@ export default function LandingPage() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Simulate fluctuating online count
   useEffect(() => {
     const interval = setInterval(() => {
       setOnlineCount((c) => c + Math.floor(Math.random() * 21) - 10);
@@ -61,57 +63,17 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleScroll = useCallback(() => {
-    setScrollY(window.scrollY);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Gradient background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute w-[800px] h-[800px] rounded-full opacity-20"
-          style={{
-            background: "radial-gradient(circle, hsl(var(--primary) / 0.4), transparent 70%)",
-            top: "-20%",
-            left: "-10%",
-            transform: `translateY(${scrollY * 0.03}px)`,
-          }}
-        />
-        <div
-          className="absolute w-[600px] h-[600px] rounded-full opacity-15"
-          style={{
-            background: "radial-gradient(circle, hsl(var(--glow-secondary) / 0.4), transparent 70%)",
-            bottom: "-15%",
-            right: "-5%",
-            transform: `translateY(${scrollY * -0.05}px)`,
-          }}
-        />
-        <div
-          className="absolute w-[400px] h-[400px] rounded-full opacity-10"
-          style={{
-            background: "radial-gradient(circle, hsl(330 70% 50% / 0.3), transparent 70%)",
-            top: "40%",
-            right: "20%",
-            transform: `translateY(${scrollY * 0.04}px)`,
-          }}
-        />
-      </div>
-
-      {/* Floating profile photos */}
-      <FloatingProfiles profiles={PROFILES} scrollY={scrollY} />
+      <ParticleBackground />
 
       {/* ═══ Top Nav ═══ */}
-      <nav className="relative z-30 flex items-center justify-between px-6 lg:px-10 py-5">
+      <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
         <span className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
           Sahara
         </span>
         <div className="flex items-center gap-3 md:gap-5">
+          {/* Nav links */}
           <a href="#" className="text-sm font-semibold text-foreground hover:text-primary transition-colors hidden md:block">
             Video Chat
           </a>
@@ -122,20 +84,25 @@ export default function LandingPage() {
             About
           </a>
 
+          {/* Divider */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
 
+          {/* Shop */}
           <button className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
             <ShoppingBag className="w-4 h-4 text-amber-400" />
             Shop
           </button>
 
+          {/* History */}
           <button className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
             <Clock className="w-4 h-4" />
             History
           </button>
 
+          {/* Divider */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
 
+          {/* Social icons */}
           <div className="hidden lg:flex items-center gap-2">
             <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <Smartphone className="w-4 h-4" />
@@ -151,6 +118,7 @@ export default function LandingPage() {
             </a>
           </div>
 
+          {/* Separator + Log in */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
           <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Log in
@@ -160,101 +128,113 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ═══ Hero Content (centered, glassmorphism card) ═══ */}
-      <div className="relative z-20 flex items-center justify-center min-h-[calc(100vh-80px)] px-6">
-        <div className="text-center max-w-2xl mx-auto">
-          {/* Glassmorphism card */}
-          <div className="glass-strong rounded-3xl px-8 md:px-14 py-12 md:py-16 shadow-2xl">
-            {/* Brand */}
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-bold tracking-tighter select-none leading-none mb-6 sahara-shine cursor-default">
-              sahara
-            </h1>
+      {/* ═══ Main Content ═══ */}
+      <div className="relative z-10 flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
+        {/* ─── Left Panel: Brand + CTA ─── */}
+        <div className="lg:w-[48%] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0 relative">
+          {/* Large brand name */}
+          <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-bold tracking-tighter select-none leading-none mb-8 sahara-shine cursor-default">
+            sahara
+          </h1>
 
-            {/* Tagline */}
-            <p className="text-lg md:text-xl text-muted-foreground font-light mb-8">
-              Real Conversations. Real People.
-            </p>
-
-            {/* Online counter */}
-            <div className="flex items-center justify-center gap-2.5 mb-10">
-              <span className="w-2.5 h-2.5 rounded-full bg-[hsl(142_70%_45%)] animate-pulse" />
-              <span className="text-base font-medium text-foreground">
-                {onlineCount.toLocaleString()} are matching now!
-              </span>
-            </div>
-
-            {/* Stats */}
-            <div className="mb-10">
-              <StatsCounter />
-            </div>
-
-            {/* Controls */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              {/* Gender */}
-              <div className="relative" ref={genderRef}>
-                <button
-                  onClick={() => setGenderOpen((o) => !o)}
-                  className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5 hover:bg-secondary/80 transition-all duration-200"
-                >
-                  <span className="text-lg">{gender === "Male" ? "👦" : "👧"}</span>
-                  <span className="text-sm font-medium">Gender</span>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${genderOpen ? "rotate-180" : ""}`} />
-                </button>
-                {genderOpen && (
-                  <div className="absolute bottom-full mb-2 left-0 w-36 rounded-xl bg-card border border-border shadow-xl z-50 py-1 animate-fade-in">
-                    {GENDERS.map((g) => (
-                      <button key={g} onClick={() => { setGender(g); setGenderOpen(false); }}
-                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${g === gender ? "text-primary" : "text-foreground"}`}>
-                        <span>{g === "Male" ? "👦" : "👧"}</span>
-                        <span className="font-medium">{g}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Country */}
-              <div className="relative" ref={countryRef}>
-                <button
-                  onClick={() => setCountryOpen((o) => !o)}
-                  className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5 hover:bg-secondary/80 transition-all duration-200"
-                >
-                  <span className="text-lg">{country.flag}</span>
-                  <span className="text-sm font-medium">Country</span>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${countryOpen ? "rotate-180" : ""}`} />
-                </button>
-                {countryOpen && (
-                  <div className="absolute bottom-full mb-2 left-0 w-44 max-h-56 overflow-y-auto rounded-xl bg-card border border-border shadow-xl z-50 py-1 animate-fade-in">
-                    {COUNTRIES.map((c) => (
-                      <button key={c.code} onClick={() => { setCountry(c); setCountryOpen(false); }}
-                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${c.code === country.code ? "text-primary" : "text-foreground"}`}>
-                        <span className="text-base">{c.flag}</span>
-                        <span className="font-medium">{c.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* CTA */}
-              <button
-                onClick={() => navigate("/live")}
-                className="h-12 px-8 rounded-full bg-primary text-primary-foreground flex items-center gap-2.5
-                  font-display font-bold text-sm tracking-tight
-                  shadow-[0_4px_20px_hsl(var(--primary)/0.4),0_0_40px_hsl(var(--primary)/0.15)]
-                  hover:scale-105 hover:shadow-[0_6px_30px_hsl(var(--primary)/0.5),0_0_60px_hsl(var(--primary)/0.2)]
-                  active:scale-[0.98] transition-all duration-300"
-              >
-                <Video className="w-5 h-5" />
-                Start Video Chat
-              </button>
-            </div>
+          {/* Online counter */}
+          <div className="flex items-center gap-2.5 mb-12">
+            <span className="w-2.5 h-2.5 rounded-full bg-[hsl(142_70%_45%)] animate-pulse" />
+            <span className="text-base font-medium text-foreground">
+              {onlineCount.toLocaleString()} are matching now!
+            </span>
           </div>
 
-          {/* Trust line */}
-          <p className="mt-8 text-xs text-muted-foreground/40 tracking-widest uppercase">
-            Encrypted · Anonymous · Instant
-          </p>
+          {/* Stats */}
+          <div className="mb-12">
+            <StatsCounter />
+          </div>
+
+          {/* ─── Bottom Controls ─── */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Gender dropdown */}
+            <div className="relative" ref={genderRef}>
+              <button
+                onClick={() => setGenderOpen((o) => !o)}
+                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5
+                  hover:bg-secondary/80 transition-all duration-200"
+              >
+                <span className="text-lg">{gender === "Male" ? "👦" : "👧"}</span>
+                <span className="text-sm font-medium">Gender</span>
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${genderOpen ? "rotate-180" : ""}`} />
+              </button>
+              {genderOpen && (
+                <div className="absolute bottom-full mb-2 left-0 w-36 rounded-xl bg-card border border-border shadow-xl z-50 py-1 animate-fade-in">
+                  {GENDERS.map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => { setGender(g); setGenderOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${
+                        g === gender ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      <span>{g === "Male" ? "👦" : "👧"}</span>
+                      <span className="font-medium">{g}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Country dropdown */}
+            <div className="relative" ref={countryRef}>
+              <button
+                onClick={() => setCountryOpen((o) => !o)}
+                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5
+                  hover:bg-secondary/80 transition-all duration-200"
+              >
+                <span className="text-lg">{country.flag}</span>
+                <span className="text-sm font-medium">Country</span>
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${countryOpen ? "rotate-180" : ""}`} />
+              </button>
+              {countryOpen && (
+                <div className="absolute bottom-full mb-2 left-0 w-44 max-h-56 overflow-y-auto rounded-xl bg-card border border-border shadow-xl z-50 py-1 animate-fade-in">
+                  {COUNTRIES.map((c) => (
+                    <button
+                      key={c.code}
+                      onClick={() => { setCountry(c); setCountryOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${
+                        c.code === country.code ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      <span className="text-base">{c.flag}</span>
+                      <span className="font-medium">{c.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Start Video Chat CTA */}
+            <button
+              onClick={() => navigate("/live")}
+              className="h-12 px-8 rounded-full bg-foreground text-background flex items-center gap-2.5
+                font-display font-bold text-sm tracking-tight
+                shadow-[0_4px_20px_hsl(var(--foreground)/0.2)]
+                hover:scale-105 hover:shadow-[0_6px_30px_hsl(var(--foreground)/0.3)]
+                active:scale-[0.98] transition-all duration-200"
+            >
+              <Video className="w-5 h-5" />
+              Start Video Chat
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Right Panel: Profile Grid ─── */}
+        <div className="lg:w-[52%] px-4 lg:px-6 py-6 lg:py-4 overflow-hidden">
+          <div className="grid grid-cols-3 gap-3 h-full" style={{ gridTemplateRows: "1fr 1fr" }}>
+            {/* First card spans 2 rows */}
+            <ProfileCard image={PROFILES[0].image} name={PROFILES[0].name} age={PROFILES[0].age} flag={PROFILES[0].flag} className="row-span-2" />
+            {/* Remaining 4 cards fill the 2x2 grid */}
+            {PROFILES.slice(1, 5).map((p, i) => (
+              <ProfileCard key={i} image={p.image} name={p.name} age={p.age} flag={p.flag} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
