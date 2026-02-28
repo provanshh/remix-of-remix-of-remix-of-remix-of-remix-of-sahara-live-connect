@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, PhoneOff, SkipForward, Send } from "lucide-react";
+import { Video, VideoOff, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
+import ControlPanel from "@/components/ControlPanel";
 
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
 type ConnectionState = "searching" | "connected";
@@ -203,23 +204,16 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* Controls Bar */}
-      <div className="flex items-center justify-center py-2.5 border-t border-border/20">
-        <div className="glass-strong rounded-full px-3 py-1.5 flex items-center gap-1.5">
-          <ControlBtn onClick={handleNext} active={false} accent title="Next">
-            <SkipForward className="w-4 h-4" />
-          </ControlBtn>
-          <ControlBtn onClick={toggleCamera} active={!cameraOn} title={cameraOn ? "Turn off camera" : "Turn on camera"}>
-            {cameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-          </ControlBtn>
-          <ControlBtn onClick={toggleMic} active={!micOn} title={micOn ? "Mute" : "Unmute"}>
-            {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-          </ControlBtn>
-          <ControlBtn onClick={handleEnd} active={false} danger title="Stop">
-            <PhoneOff className="w-4 h-4" />
-          </ControlBtn>
-        </div>
-      </div>
+      {/* Control Panel */}
+      <ControlPanel
+        isConnected={chatEnabled}
+        onStart={handleNext}
+        onStop={handleEnd}
+        cameraOn={cameraOn}
+        micOn={micOn}
+        onToggleCamera={toggleCamera}
+        onToggleMic={toggleMic}
+      />
 
       {/* Chat Section */}
       <div
@@ -288,39 +282,5 @@ export default function LiveChat() {
         </div>
       </div>
     </div>
-  );
-}
-
-function ControlBtn({
-  children,
-  onClick,
-  active,
-  accent,
-  danger,
-  title,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-  accent?: boolean;
-  danger?: boolean;
-  title?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
-        danger
-          ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
-          : accent
-          ? "text-primary hover:bg-primary/10"
-          : active
-          ? "bg-destructive/20 text-destructive"
-          : "text-foreground/70 hover:text-foreground hover:bg-muted/50"
-      }`}
-    >
-      {children}
-    </button>
   );
 }
