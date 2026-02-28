@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import StatsCounter from "@/components/StatsCounter";
 import ParticleBackground from "@/components/ParticleBackground";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function LandingPage() {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Live Now
           </span>
+          <ThemeToggle />
         </div>
       </nav>
 

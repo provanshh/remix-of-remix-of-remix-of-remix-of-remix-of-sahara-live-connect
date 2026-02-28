@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Video, VideoOff, Mic, MicOff, PhoneOff, SkipForward, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
 type ConnectionState = "searching" | "connected";
@@ -21,6 +22,8 @@ export default function LiveChat() {
   const [searchDots, setSearchDots] = useState("");
   const [remoteVisible, setRemoteVisible] = useState(false);
 
+  const chatEnabled = connectionState === "connected";
+
   // Animated dots for searching
   useEffect(() => {
     if (connectionState !== "searching") return;
@@ -33,7 +36,6 @@ export default function LiveChat() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Start local camera only — never assign to remote
   const startLocalCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -52,30 +54,23 @@ export default function LiveChat() {
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
   }, []);
 
-  // Clear remote panel completely — never use local stream
   const clearRemote = useCallback(() => {
     setRemoteVisible(false);
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
   }, []);
 
-  // Simulate match (in production, WebRTC signaling provides remote stream)
   const simulateMatch = useCallback(() => {
     setConnectionState("searching");
     clearRemote();
+    setMessages([{ text: "Looking for someone…", sender: "system" }]);
 
-    // In production: WebRTC peer connection would provide the remote stream here.
-    // For demo, after delay we show "connected" state but remote panel stays blank
-    // because there is no real remote user to connect to.
     setTimeout(() => {
       setConnectionState("connected");
       setMessages((m) => [...m, { text: "Connected! Say hello 👋", sender: "system" }]);
-      // Remote video would be set here via: remoteVideoRef.current.srcObject = remoteStream
-      // Since no real peer exists, left panel shows "Waiting for video…" instead of mirroring local.
       setRemoteVisible(true);
     }, 3000);
   }, [clearRemote]);
 
-  // Init on mount
   useEffect(() => {
     const init = async () => {
       const ok = await startLocalCamera();
@@ -91,7 +86,9 @@ export default function LiveChat() {
 
   const handleNext = useCallback(() => {
     clearRemote();
-    setMessages((m) => [...m, { text: "Looking for a new connection…", sender: "system" }]);
+    setConnectionState("searching");
+    setMessages([{ text: "Looking for a new connection…", sender: "system" }]);
+    setInput("");
     simulateMatch();
   }, [clearRemote, simulateMatch]);
 
@@ -102,7 +99,7 @@ export default function LiveChat() {
   }, [clearRemote, stopLocalCamera, navigate]);
 
   const handleSend = useCallback(() => {
-    if (!input.trim()) return;
+    if (!chatEnabled || !input.trim()) return;
     const result = filterMessage(input.trim());
     if (!result.clean) {
       setMessages((m) => [...m, { text: "Blocked: inappropriate language.", sender: "system" }]);
@@ -110,7 +107,7 @@ export default function LiveChat() {
       setMessages((m) => [...m, { text: result.filtered, sender: "me" }]);
     }
     setInput("");
-  }, [input]);
+  }, [input, chatEnabled]);
 
   const toggleCamera = useCallback(() => {
     localStreamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
@@ -123,12 +120,16 @@ export default function LiveChat() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
+      {/* Theme toggle */}
+      <div className="absolute top-3 right-3 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Video Section */}
       <div className="flex-1 flex relative min-h-0" style={{ maxHeight: "78vh" }}>
         {/* Remote Video — Left (Stranger) */}
         <div className="w-1/2 relative bg-muted/20 overflow-hidden">
-          {/* Remote video element — only receives actual remote stream, never local */}
           <video
             ref={remoteVideoRef}
             autoPlay
@@ -141,7 +142,6 @@ export default function LiveChat() {
           />
           <div className="absolute inset-0 bg-background/10 pointer-events-none" />
 
-          {/* Searching / Waiting state */}
           {connectionState === "searching" && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <div className="relative mb-5">
@@ -157,7 +157,6 @@ export default function LiveChat() {
             </div>
           )}
 
-          {/* Connected but no real remote stream yet */}
           {connectionState === "connected" && !remoteVideoRef.current?.srcObject && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <div className="w-16 h-16 rounded-full border border-border/30 flex items-center justify-center mb-3">
@@ -168,7 +167,6 @@ export default function LiveChat() {
             </div>
           )}
 
-          {/* Label */}
           <div className="absolute top-3 left-3 z-20 glass rounded-full px-2.5 py-1 text-[10px] tracking-wide uppercase font-medium text-muted-foreground">
             {connectionState === "connected" ? (
               <span className="flex items-center gap-1.5">
@@ -181,7 +179,6 @@ export default function LiveChat() {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="w-px bg-border/30" />
 
         {/* Local Video — Right (You) */}
@@ -200,7 +197,7 @@ export default function LiveChat() {
               <VideoOff className="w-8 h-8 text-muted-foreground/50" />
             </div>
           )}
-          <div className="absolute top-3 right-3 z-20 glass rounded-full px-2.5 py-1 text-[10px] text-muted-foreground tracking-wide uppercase font-medium">
+          <div className="absolute top-3 right-14 z-20 glass rounded-full px-2.5 py-1 text-[10px] text-muted-foreground tracking-wide uppercase font-medium">
             You
           </div>
         </div>
@@ -225,7 +222,14 @@ export default function LiveChat() {
       </div>
 
       {/* Chat Section */}
-      <div className="border-t border-border/20 flex flex-col" style={{ height: "14vh" }}>
+      <div
+        className={`border-t flex flex-col transition-all duration-500 ${
+          chatEnabled
+            ? "border-primary/40 shadow-[0_-2px_20px_hsl(var(--glow-primary)/0.15)]"
+            : "border-border/20"
+        }`}
+        style={{ height: "14vh" }}
+      >
         <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1.5 min-h-0">
           {messages.map((msg, i) => (
             <div
@@ -259,14 +263,24 @@ export default function LiveChat() {
           <div className="flex gap-2">
             <input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => chatEnabled && setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Write a message…"
-              className="flex-1 bg-muted/50 border-none rounded-full px-4 py-2 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring/30"
+              disabled={!chatEnabled}
+              placeholder={chatEnabled ? "Write a message…" : "Chat will be enabled once connected…"}
+              className={`flex-1 border-none rounded-full px-4 py-2 text-xs placeholder:text-muted-foreground/50 focus:outline-none transition-all duration-500 ${
+                chatEnabled
+                  ? "bg-muted/50 text-foreground focus:ring-1 focus:ring-ring/30"
+                  : "bg-muted/20 text-muted-foreground/30 opacity-50 cursor-not-allowed"
+              }`}
             />
             <button
               onClick={handleSend}
-              className="w-8 h-8 rounded-full gradient-primary text-primary-foreground flex items-center justify-center shrink-0 hover:scale-105 transition-transform"
+              disabled={!chatEnabled}
+              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
+                chatEnabled
+                  ? "gradient-primary text-primary-foreground hover:scale-105"
+                  : "bg-muted/30 text-muted-foreground/30 cursor-not-allowed"
+              }`}
             >
               <Send className="w-3.5 h-3.5" />
             </button>
