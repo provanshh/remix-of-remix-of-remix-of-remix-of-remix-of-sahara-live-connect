@@ -6,23 +6,23 @@ import ThemeToggle from "@/components/ThemeToggle";
 import MatchRevealOverlay from "@/components/MatchRevealOverlay";
 
 const COUNTRIES = [
-  { code: "US", name: "USA", flag: "🇺🇸" },
-  { code: "GB", name: "UK", flag: "🇬🇧" },
-  { code: "DE", name: "Germany", flag: "🇩🇪" },
-  { code: "FR", name: "France", flag: "🇫🇷" },
-  { code: "IN", name: "India", flag: "🇮🇳" },
-  { code: "BR", name: "Brazil", flag: "🇧🇷" },
-  { code: "JP", name: "Japan", flag: "🇯🇵" },
-  { code: "KR", name: "Korea", flag: "🇰🇷" },
-  { code: "AU", name: "Australia", flag: "🇦🇺" },
-  { code: "CA", name: "Canada", flag: "🇨🇦" },
-  { code: "MX", name: "Mexico", flag: "🇲🇽" },
-  { code: "XX", name: "Any", flag: "🌍" },
-];
+{ code: "US", name: "USA", flag: "🇺🇸" },
+{ code: "GB", name: "UK", flag: "🇬🇧" },
+{ code: "DE", name: "Germany", flag: "🇩🇪" },
+{ code: "FR", name: "France", flag: "🇫🇷" },
+{ code: "IN", name: "India", flag: "🇮🇳" },
+{ code: "BR", name: "Brazil", flag: "🇧🇷" },
+{ code: "JP", name: "Japan", flag: "🇯🇵" },
+{ code: "KR", name: "Korea", flag: "🇰🇷" },
+{ code: "AU", name: "Australia", flag: "🇦🇺" },
+{ code: "CA", name: "Canada", flag: "🇨🇦" },
+{ code: "MX", name: "Mexico", flag: "🇲🇽" },
+{ code: "XX", name: "Any", flag: "🌍" }];
+
 
 type Country = (typeof COUNTRIES)[number];
 type Gender = "boy" | "girl";
-type ChatMessage = { text: string; sender: "me" | "them" | "system" };
+type ChatMessage = {text: string;sender: "me" | "them" | "system";};
 type ConnectionState = "searching" | "revealing" | "connected";
 
 export default function LiveChat() {
@@ -61,7 +61,7 @@ export default function LiveChat() {
   // Animated dots
   useEffect(() => {
     if (connectionState !== "searching") return;
-    const interval = setInterval(() => setSearchDots((d) => (d.length >= 3 ? "" : d + ".")), 500);
+    const interval = setInterval(() => setSearchDots((d) => d.length >= 3 ? "" : d + "."), 500);
     return () => clearInterval(interval);
   }, [connectionState]);
 
@@ -103,7 +103,7 @@ export default function LiveChat() {
     clearRemote();
     setMessages([{ text: "Looking for someone…", sender: "system" }]);
     const randomCountry = COUNTRIES[Math.floor(Math.random() * (COUNTRIES.length - 1))];
-    const randomGender = Math.random() > 0.5 ? ("boy" as const) : ("girl" as const);
+    const randomGender = Math.random() > 0.5 ? "boy" as const : "girl" as const;
     setTimeout(() => {
       setMatchCountry(randomCountry);
       setMatchGender(randomGender);
@@ -147,12 +147,12 @@ export default function LiveChat() {
   }, [input, chatEnabled]);
 
   const toggleCamera = useCallback(() => {
-    localStreamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
+    localStreamRef.current?.getVideoTracks().forEach((t) => t.enabled = !t.enabled);
     setCameraOn((v) => !v);
   }, []);
 
   const toggleMic = useCallback(() => {
-    localStreamRef.current?.getAudioTracks().forEach((t) => (t.enabled = !t.enabled));
+    localStreamRef.current?.getAudioTracks().forEach((t) => t.enabled = !t.enabled);
     setMicOn((v) => !v);
   }, []);
 
@@ -170,8 +170,8 @@ export default function LiveChat() {
           visible={connectionState === "revealing"}
           country={matchCountry}
           gender={matchGender}
-          onRevealComplete={handleRevealComplete}
-        />
+          onRevealComplete={handleRevealComplete} />
+
 
         {/* LEFT — Stranger */}
         <div className="w-1/2 relative bg-background overflow-hidden">
@@ -180,13 +180,13 @@ export default function LiveChat() {
             autoPlay
             playsInline
             className={`w-full h-full object-cover transition-opacity duration-700 ${
-              connectionState === "connected" && remoteVisible ? "opacity-100" : "opacity-0"
-            }`}
-          />
+            connectionState === "connected" && remoteVisible ? "opacity-100" : "opacity-0"}`
+            } />
+
 
           {/* Searching state */}
-          {connectionState === "searching" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          {connectionState === "searching" &&
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <div className="relative mb-5">
                 <div className="w-14 h-14 rounded-full border border-primary/30 animate-pulse-ring absolute -inset-1" />
                 <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
@@ -197,22 +197,22 @@ export default function LiveChat() {
                 Searching{searchDots}
               </p>
             </div>
-          )}
+          }
 
           {/* Waiting for video */}
-          {connectionState === "connected" && !remoteVideoRef.current?.srcObject && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          {connectionState === "connected" && !remoteVideoRef.current?.srcObject &&
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <Video className="w-8 h-8 text-muted-foreground/30 mb-2" />
               <p className="text-muted-foreground/40 text-xs">Waiting for video…</p>
             </div>
-          )}
+          }
 
           {/* Stranger label */}
           <div className="absolute top-4 left-4 z-20">
             <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-              {connectionState === "connected" && (
-                <span className="w-2 h-2 rounded-full bg-[hsl(142_70%_45%)] animate-pulse shrink-0" />
-              )}
+              {connectionState === "connected" &&
+              <span className="w-2 h-2 rounded-full bg-[hsl(142_70%_45%)] animate-pulse shrink-0" />
+              }
               <span className={connectionState === "connected" ? "text-foreground" : ""}>
                 Stranger
               </span>
@@ -231,13 +231,13 @@ export default function LiveChat() {
             playsInline
             muted
             className="w-full h-full object-cover"
-            style={{ transform: "scaleX(-1)" }}
-          />
-          {!cameraOn && (
-            <div className="absolute inset-0 bg-background flex items-center justify-center">
+            style={{ transform: "scaleX(-1)" }} />
+
+          {!cameraOn &&
+          <div className="absolute inset-0 bg-background flex items-center justify-center">
               <VideoOff className="w-8 h-8 text-muted-foreground/30" />
             </div>
-          )}
+          }
 
           {/* You label */}
           <div className="absolute top-4 right-14 z-20">
@@ -260,8 +260,8 @@ export default function LiveChat() {
               bg-[hsl(142_70%_42%)] text-[hsl(0_0%_100%)]
               shadow-[0_2px_16px_hsl(142_70%_42%/0.35)]
               hover:shadow-[0_4px_24px_hsl(142_70%_42%/0.5)] hover:brightness-110
-              active:scale-[0.97] transition-all duration-200"
-          >
+              active:scale-[0.97] transition-all duration-200">
+
             {chatEnabled ? "Next" : "Start"}
           </button>
 
@@ -272,8 +272,8 @@ export default function LiveChat() {
               bg-destructive/80 text-destructive-foreground
               shadow-[0_2px_12px_hsl(var(--destructive)/0.25)]
               hover:shadow-[0_4px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
-              active:scale-[0.97] transition-all duration-200"
-          >
+              active:scale-[0.97] transition-all duration-200">
+
             Stop
           </button>
 
@@ -282,35 +282,35 @@ export default function LiveChat() {
             <button
               onClick={() => setDropdownOpen((o) => !o)}
               className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
-                hover:bg-muted transition-all duration-200 border border-border/20"
-            >
+                hover:bg-muted transition-all duration-200 border border-border/20">
+
               <span className="text-2xl leading-none">{country.flag}</span>
               <span className="text-[11px] font-medium text-muted-foreground">Country</span>
             </button>
-            {dropdownOpen && (
-              <div className="absolute bottom-full mb-2 left-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
-                {COUNTRIES.map((c) => (
-                  <button
-                    key={c.code}
-                    onClick={() => { setCountry(c); setDropdownOpen(false); }}
-                    className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${
-                      c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"
-                    }`}
-                  >
+            {dropdownOpen &&
+            <div className="absolute bottom-full mb-2 left-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
+                {COUNTRIES.map((c) =>
+              <button
+                key={c.code}
+                onClick={() => {setCountry(c);setDropdownOpen(false);}}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${
+                c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"}`
+                }>
+
                     <span className="text-base leading-none">{c.flag}</span>
                     <span className="font-medium text-xs">{c.name}</span>
                   </button>
-                ))}
+              )}
               </div>
-            )}
+            }
           </div>
 
           {/* Gender */}
           <button
             onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
             className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
-              hover:bg-muted transition-all duration-200 border border-border/20"
-          >
+              hover:bg-muted transition-all duration-200 border border-border/20">
+
             <span className="text-2xl leading-none">{gender === "boy" ? "👦" : "👧"}</span>
             <span className="text-[11px] font-medium text-muted-foreground">I am</span>
           </button>
@@ -320,11 +320,11 @@ export default function LiveChat() {
             onClick={toggleCamera}
             title={cameraOn ? "Turn off camera" : "Turn on camera"}
             className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
-              ${!cameraOn
-                ? "bg-destructive/20 text-destructive"
-                : "bg-muted/80 text-foreground hover:bg-muted"
-              }`}
-          >
+              ${!cameraOn ?
+            "bg-destructive/20 text-destructive" :
+            "bg-muted/80 text-foreground hover:bg-muted"}`
+            }>
+
             {cameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
           </button>
 
@@ -333,11 +333,11 @@ export default function LiveChat() {
             onClick={toggleMic}
             title={micOn ? "Mute" : "Unmute"}
             className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
-              ${!micOn
-                ? "bg-destructive/20 text-destructive"
-                : "bg-muted/80 text-foreground hover:bg-muted"
-              }`}
-          >
+              ${!micOn ?
+            "bg-destructive/20 text-destructive" :
+            "bg-muted/80 text-foreground hover:bg-muted"}`
+            }>
+
             {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
           </button>
         </div>
@@ -346,8 +346,8 @@ export default function LiveChat() {
       {/* ═══ Full-Width Horizontal Chat Bar ═══ */}
       <div
         className={`h-52 shrink-0 w-full flex flex-col overflow-hidden
-          bg-background/95 backdrop-blur-2xl transition-all duration-500`}
-      >
+          bg-background/95 backdrop-blur-2xl transition-all duration-500`}>
+
         {/* Chat header */}
         <div className="px-5 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
           <span className="w-2 h-2 rounded-full bg-[hsl(330_90%_60%)] animate-pulse shrink-0" />
@@ -356,29 +356,29 @@ export default function LiveChat() {
 
         {/* Scrollable messages */}
         <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-5 py-2 space-y-1.5">
-          {messages.length === 0 && (
-            <p className="text-[11px] text-muted-foreground/30 text-center mt-6 italic">No messages yet</p>
-          )}
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
-            >
-              {msg.sender === "system" ? (
-                <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
-              ) : (
-                <span
-                  className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[40%] break-words ${
-                    msg.sender === "me"
-                      ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] rounded-br-sm"
-                      : "bg-muted/60 text-foreground rounded-bl-sm"
-                  }`}
-                >
+          {messages.length === 0 &&
+          <p className="text-[11px] text-muted-foreground/30 text-center mt-6 italic">No messages yet</p>
+          }
+          {messages.map((msg, i) =>
+          <div
+            key={i}
+            className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}>
+
+              {msg.sender === "system" ?
+            <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span> :
+
+            <span
+              className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[40%] break-words ${
+              msg.sender === "me" ?
+              "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] rounded-br-sm" :
+              "bg-muted/60 text-foreground rounded-bl-sm"}`
+              }>
+
                   {msg.text}
                 </span>
-              )}
+            }
             </div>
-          ))}
+          )}
           <div ref={chatEndRef} />
         </div>
 
@@ -391,24 +391,24 @@ export default function LiveChat() {
             disabled={!chatEnabled}
             placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
             className={`flex-1 rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none transition-all duration-300 ${
-              chatEnabled
-                ? "bg-[hsl(180_50%_10%)] text-[hsl(180_40%_88%)] border-2 border-[hsl(180_80%_45%/0.6)] placeholder:text-[hsl(180_60%_60%/0.8)] shadow-[inset_0_0_10px_hsl(180_70%_40%/0.12)] focus:border-[hsl(180_80%_50%)] focus:shadow-[0_0_14px_hsl(180_80%_50%/0.35),inset_0_0_10px_hsl(180_70%_40%/0.12)]"
-                : "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"
-            }`}
-          />
+            chatEnabled ?
+            "bg-[hsl(180_50%_10%)] text-[hsl(180_40%_88%)] border-2 border-[hsl(180_80%_45%/0.6)] placeholder:text-[hsl(180_60%_60%/0.8)] shadow-[inset_0_0_10px_hsl(180_70%_40%/0.12)] focus:border-[hsl(180_80%_50%)] focus:shadow-[0_0_14px_hsl(180_80%_50%/0.35),inset_0_0_10px_hsl(180_70%_40%/0.12)]" :
+            "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"}`
+            } />
+
           <button
             onClick={handleSend}
             disabled={!chatEnabled}
             className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-              chatEnabled
-                ? "bg-[hsl(180_80%_45%)] text-[hsl(180_80%_4%)] hover:scale-110 shadow-[0_0_12px_hsl(180_80%_45%/0.4)]"
-                : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
-            }`}
-          >
+            chatEnabled ?
+            "bg-[hsl(180_80%_45%)] text-[hsl(180_80%_4%)] hover:scale-110 shadow-[0_0_12px_hsl(180_80%_45%/0.4)]" :
+            "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"}`
+            }>
+
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
