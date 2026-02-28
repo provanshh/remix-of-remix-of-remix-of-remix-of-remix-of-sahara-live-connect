@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook, LogIn } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ParticleBackground from "@/components/ParticleBackground";
-import ProfileCard from "@/components/ProfileCard";
 import StatsCounter from "@/components/StatsCounter";
+import AutoScrollCarousel from "@/components/AutoScrollCarousel";
 
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
@@ -225,16 +225,9 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* ─── Right Panel: Profile Grid ─── */}
-        <div className="lg:w-[52%] px-4 lg:px-6 py-6 lg:py-4 overflow-hidden">
-          <div className="grid grid-cols-3 gap-3 h-full" style={{ gridTemplateRows: "1fr 1fr" }}>
-            {/* First card spans 2 rows */}
-            <ProfileCard image={PROFILES[0].image} name={PROFILES[0].name} age={PROFILES[0].age} flag={PROFILES[0].flag} className="row-span-2" />
-            {/* Remaining 4 cards fill the 2x2 grid */}
-            {PROFILES.slice(1, 5).map((p, i) => (
-              <ProfileCard key={i} image={p.image} name={p.name} age={p.age} flag={p.flag} />
-            ))}
-          </div>
+        {/* ─── Right Panel: Auto-Scrolling Carousel ─── */}
+        <div className="lg:w-[52%] px-4 lg:px-6 py-6 lg:py-4 h-[calc(100vh-80px)]">
+          <AutoScrollCarousel profiles={PROFILES} />
         </div>
       </div>
     </div>
