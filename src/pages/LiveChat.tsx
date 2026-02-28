@@ -383,7 +383,7 @@ export default function LiveChat() {
         </div>
 
         {/* Pinned input — neon orange */}
-        <div className="px-5 py-2.5 border-t border-[hsl(25_90%_45%/0.25)] flex items-center gap-3 shrink-0">
+        <div className="px-5 py-2.5 border-t border-[hsl(180_60%_40%/0.2)] flex items-center gap-3 shrink-0">
           <input
             value={input}
             onChange={(e) => chatEnabled && setInput(e.target.value)}
@@ -392,7 +392,7 @@ export default function LiveChat() {
             placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
             className={`flex-1 rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none transition-all duration-300 ${
               chatEnabled
-                ? "bg-[hsl(25_60%_10%)] text-[hsl(25_90%_85%)] border-2 border-[hsl(25_90%_50%/0.7)] placeholder:text-[hsl(25_80%_55%/0.8)] shadow-[inset_0_0_10px_hsl(25_90%_40%/0.15)] focus:border-[hsl(25_95%_55%)] focus:shadow-[0_0_14px_hsl(25_90%_50%/0.35),inset_0_0_10px_hsl(25_90%_40%/0.15)]"
+                ? "bg-[hsl(180_50%_10%)] text-[hsl(180_40%_88%)] border-2 border-[hsl(180_80%_45%/0.6)] placeholder:text-[hsl(180_60%_60%/0.8)] shadow-[inset_0_0_10px_hsl(180_70%_40%/0.12)] focus:border-[hsl(180_80%_50%)] focus:shadow-[0_0_14px_hsl(180_80%_50%/0.35),inset_0_0_10px_hsl(180_70%_40%/0.12)]"
                 : "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"
             }`}
           />
@@ -401,7 +401,7 @@ export default function LiveChat() {
             disabled={!chatEnabled}
             className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
               chatEnabled
-                ? "bg-[hsl(25_90%_50%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_12px_hsl(25_90%_50%/0.4)]"
+                ? "bg-[hsl(180_80%_45%)] text-[hsl(180_80%_4%)] hover:scale-110 shadow-[0_0_12px_hsl(180_80%_45%/0.4)]"
                 : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
             }`}
           >
