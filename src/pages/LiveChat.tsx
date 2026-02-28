@@ -101,7 +101,7 @@ export default function LiveChat() {
   const simulateMatch = useCallback(() => {
     setConnectionState("searching");
     clearRemote();
-    setMessages([{ text: "Looking for someone…", sender: "system" }]);
+    setMessages([{ text: "\n", sender: "system" }]);
     const randomCountry = COUNTRIES[Math.floor(Math.random() * (COUNTRIES.length - 1))];
     const randomGender = Math.random() > 0.5 ? "boy" as const : "girl" as const;
     setTimeout(() => {
