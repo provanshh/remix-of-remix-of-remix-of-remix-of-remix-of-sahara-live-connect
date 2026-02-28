@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ChevronDown } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ChevronDown, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -32,6 +32,7 @@ export default function LiveChat() {
   const localStreamRef = useRef<MediaStream | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   const [connectionState, setConnectionState] = useState<ConnectionState>("searching");
   const [cameraOn, setCameraOn] = useState(true);
@@ -306,6 +307,16 @@ export default function LiveChat() {
               >
                 {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
               </button>
+
+              {/* Chat */}
+              <button
+                onClick={() => chatInputRef.current?.focus()}
+                title="Open chat"
+                className="h-14 w-14 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
+                  bg-muted/80 text-foreground hover:bg-muted"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -383,6 +394,7 @@ export default function LiveChat() {
             {/* Input */}
             <div className="px-4 py-2 border-t border-border/10 flex items-center gap-2 shrink-0">
               <input
+                ref={chatInputRef}
                 value={input}
                 onChange={(e) => chatEnabled && setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
