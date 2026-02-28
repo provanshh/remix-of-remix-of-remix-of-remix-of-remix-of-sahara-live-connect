@@ -7,18 +7,12 @@ interface StatItem {
   prefix?: string;
 }
 
-function randomInRange(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomStats(): StatItem[] {
-  return [
-    { label: "Active Users Online", value: randomInRange(12800, 12900), prefix: "" },
-    { label: "Connections Today", value: randomInRange(284550, 284650), prefix: "" },
-    { label: "Avg Match Time", value: randomInRange(3, 4), suffix: "s" },
-    { label: "Countries Connected", value: randomInRange(140, 145), prefix: "" },
-  ];
-}
+const stats: StatItem[] = [
+  { label: "Active Users Online", value: 12847, prefix: "" },
+  { label: "Connections Today", value: 284591, prefix: "" },
+  { label: "Avg Match Time", value: 3, suffix: "s" },
+  { label: "Countries Connected", value: 142, prefix: "" },
+];
 
 function AnimatedNumber({ target, suffix, prefix }: { target: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
@@ -59,7 +53,6 @@ function AnimatedNumber({ target, suffix, prefix }: { target: number; suffix?: s
 }
 
 export default function StatsCounter() {
-  const [stats] = useState(() => getRandomStats());
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
       {stats.map((stat) => (
