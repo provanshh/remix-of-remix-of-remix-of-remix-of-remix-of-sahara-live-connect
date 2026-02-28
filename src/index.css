@@ -143,4 +143,40 @@
                 radial-gradient(ellipse at 80% 50%, hsl(var(--glow-secondary) / 0.04) 0%, transparent 50%),
                 hsl(var(--background));
   }
+
+  .neon-chat-box {
+    border: 1.5px solid hsl(330 90% 60% / 0.6);
+    box-shadow: 0 0 12px hsl(330 90% 60% / 0.2),
+                0 0 30px hsl(330 90% 60% / 0.08),
+                inset 0 0 12px hsl(330 90% 60% / 0.03);
+  }
+
+  .neon-chat-box.neon-pulse {
+    animation: neon-border-pulse 1s ease-out;
+  }
+
+  .chat-msg-enter {
+    animation: chat-fade-in 0.3s ease-out both;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+  .chat-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(330 90% 60% / 0.25);
+    border-radius: 10px;
+  }
+}
+
+@keyframes neon-border-pulse {
+  0% { box-shadow: 0 0 12px hsl(330 90% 60% / 0.5), 0 0 40px hsl(330 90% 60% / 0.25); }
+  100% { box-shadow: 0 0 12px hsl(330 90% 60% / 0.2), 0 0 30px hsl(330 90% 60% / 0.08); }
+}
+
+@keyframes chat-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
