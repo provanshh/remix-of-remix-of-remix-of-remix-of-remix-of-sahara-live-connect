@@ -346,8 +346,7 @@ export default function LiveChat() {
       {/* ═══ Full-Width Horizontal Chat Bar ═══ */}
       <div
         className={`h-52 shrink-0 w-full flex flex-col overflow-hidden
-          bg-background/95 backdrop-blur-2xl transition-all duration-500
-          neon-chat-box ${messages.length > 0 ? "neon-pulse" : ""}`}
+          bg-background/95 backdrop-blur-2xl transition-all duration-500`}
       >
         {/* Chat header */}
         <div className="px-5 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
