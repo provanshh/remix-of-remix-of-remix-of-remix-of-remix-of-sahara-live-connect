@@ -163,8 +163,8 @@ export default function LiveChat() {
         <ThemeToggle />
       </div>
 
-      {/* Full-height video section */}
-      <div className="flex-1 flex relative min-h-0">
+      {/* Video section — reduced height for chat bar */}
+      <div className="flex relative" style={{ height: "calc(100vh - 13rem)" }}>
         {/* Match Reveal Overlay */}
         <MatchRevealOverlay
           visible={connectionState === "revealing"}
@@ -343,22 +343,22 @@ export default function LiveChat() {
         </div>
       </div>
 
-      {/* ═══ Premium Neon Chat Box ═══ */}
+      {/* ═══ Full-Width Horizontal Chat Bar ═══ */}
       <div
-        className={`absolute bottom-2 right-3 z-30 w-80 h-64 rounded-2xl overflow-hidden flex flex-col
-          bg-background/90 backdrop-blur-2xl transition-all duration-500
+        className={`h-52 shrink-0 w-full flex flex-col overflow-hidden
+          bg-background/95 backdrop-blur-2xl transition-all duration-500
           neon-chat-box ${messages.length > 0 ? "neon-pulse" : ""}`}
       >
         {/* Chat header */}
-        <div className="px-4 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2">
+        <div className="px-5 py-2 border-b border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
           <span className="w-2 h-2 rounded-full bg-[hsl(330_90%_60%)] animate-pulse shrink-0" />
           <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Chat</span>
         </div>
 
         {/* Scrollable messages */}
-        <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-3 py-2 space-y-1.5">
+        <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-5 py-2 space-y-1.5">
           {messages.length === 0 && (
-            <p className="text-[11px] text-muted-foreground/30 text-center mt-8 italic">No messages yet</p>
+            <p className="text-[11px] text-muted-foreground/30 text-center mt-6 italic">No messages yet</p>
           )}
           {messages.map((msg, i) => (
             <div
@@ -369,7 +369,7 @@ export default function LiveChat() {
                 <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
               ) : (
                 <span
-                  className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[80%] break-words ${
+                  className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[40%] break-words ${
                     msg.sender === "me"
                       ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] rounded-br-sm"
                       : "bg-muted/60 text-foreground rounded-bl-sm"
@@ -384,14 +384,14 @@ export default function LiveChat() {
         </div>
 
         {/* Pinned input */}
-        <div className="px-3 py-2 border-t border-[hsl(330_90%_60%/0.15)] flex items-center gap-2">
+        <div className="px-5 py-2 border-t border-[hsl(330_90%_60%/0.15)] flex items-center gap-2 shrink-0">
           <input
             value={input}
             onChange={(e) => chatEnabled && setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={!chatEnabled}
             placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
-            className={`flex-1 border-none rounded-full px-3 py-1.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none transition-all duration-300 ${
+            className={`flex-1 border-none rounded-full px-4 py-2 text-xs placeholder:text-muted-foreground/40 focus:outline-none transition-all duration-300 ${
               chatEnabled
                 ? "bg-muted/40 text-foreground focus:ring-1 focus:ring-[hsl(330_90%_60%/0.4)]"
                 : "bg-muted/15 text-muted-foreground/20 opacity-40 cursor-not-allowed"
@@ -400,13 +400,13 @@ export default function LiveChat() {
           <button
             onClick={handleSend}
             disabled={!chatEnabled}
-            className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
               chatEnabled
                 ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] hover:scale-110 shadow-[0_0_10px_hsl(330_90%_60%/0.3)]"
                 : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
             }`}
           >
-            <Send className="w-3 h-3" />
+            <Send className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
