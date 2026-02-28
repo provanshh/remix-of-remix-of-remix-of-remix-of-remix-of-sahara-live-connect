@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, PhoneOff, SkipForward, Send } from "lucide-react";
+import { Video, VideoOff, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
+import ControlPanel from "@/components/ControlPanel";
 
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
 type ConnectionState = "searching" | "connected";
