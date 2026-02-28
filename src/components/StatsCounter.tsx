@@ -11,7 +11,6 @@ const stats: StatItem[] = [
   { label: "Active Users Online", value: 12847, prefix: "" },
   { label: "Connections Today", value: 284591, prefix: "" },
   { label: "Avg Match Time", value: 3, suffix: "s" },
-  { label: "Countries Connected", value: 142, prefix: "" },
 ];
 
 function AnimatedNumber({ target, suffix, prefix }: { target: number; suffix?: string; prefix?: string }) {
@@ -54,7 +53,7 @@ function AnimatedNumber({ target, suffix, prefix }: { target: number; suffix?: s
 
 export default function StatsCounter() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
+    <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
       {stats.map((stat) => (
         <div
           key={stat.label}
