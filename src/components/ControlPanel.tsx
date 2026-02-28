@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { ChevronDown, Video, VideoOff, Mic, MicOff } from "lucide-react";
 
-const COUNTRIES = [
+export const COUNTRIES = [
   { code: "US", name: "USA", flag: "🇺🇸" },
   { code: "GB", name: "UK", flag: "🇬🇧" },
   { code: "DE", name: "Germany", flag: "🇩🇪" },
@@ -16,7 +16,8 @@ const COUNTRIES = [
   { code: "XX", name: "Any", flag: "🌍" },
 ];
 
-type Gender = "boy" | "girl";
+export type Gender = "boy" | "girl";
+export type Country = (typeof COUNTRIES)[number];
 
 interface ControlPanelProps {
   isConnected: boolean;
@@ -26,6 +27,10 @@ interface ControlPanelProps {
   micOn: boolean;
   onToggleCamera: () => void;
   onToggleMic: () => void;
+  gender: Gender;
+  onGenderChange: (g: Gender) => void;
+  country: Country;
+  onCountryChange: (c: Country) => void;
 }
 
 export default function ControlPanel({
@@ -36,9 +41,39 @@ export default function ControlPanel({
   micOn,
   onToggleCamera,
   onToggleMic,
+  gender,
+  onGenderChange,
+  country,
+  onCountryChange,
 }: ControlPanelProps) {
-  const [country, setCountry] = useState(COUNTRIES[COUNTRIES.length - 1]);
-  const [gender, setGender] = useState<Gender>("boy");
+  const [dropdownOpen, setDropdownOpen] = [false, () => {}] as any;
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Need real state for dropdown
+  const { 0: ddOpen, 1: setDdOpen } = { 0: false, 1: (_: any) => {} } as any;
+
+  return <ControlPanelInner
+    isConnected={isConnected}
+    onStart={onStart}
+    onStop={onStop}
+    cameraOn={cameraOn}
+    micOn={micOn}
+    onToggleCamera={onToggleCamera}
+    onToggleMic={onToggleMic}
+    gender={gender}
+    onGenderChange={onGenderChange}
+    country={country}
+    onCountryChange={onCountryChange}
+  />;
+}
+
+// Inner component with proper state
+import { useState } from "react";
+
+function ControlPanelInner({
+  isConnected, onStart, onStop, cameraOn, micOn, onToggleCamera, onToggleMic,
+  gender, onGenderChange, country, onCountryChange,
+}: ControlPanelProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -55,11 +90,10 @@ export default function ControlPanel({
   return (
     <div className="px-3 py-2.5 border-t border-border/20">
       <div className="flex flex-wrap items-stretch gap-2 max-w-3xl mx-auto">
-        {/* Start / Next */}
         <button
           onClick={onStart}
           className="flex-1 min-w-[100px] h-12 rounded-xl font-display font-semibold text-sm tracking-tight
-            bg-[hsl(142_70%_42%)] text-[hsl(0_0%_100%)] 
+            bg-[hsl(142_70%_42%)] text-[hsl(0_0%_100%)]
             shadow-[0_2px_12px_hsl(142_70%_42%/0.3)]
             hover:shadow-[0_4px_20px_hsl(142_70%_42%/0.45)] hover:brightness-110
             active:scale-[0.97] transition-all duration-200"
@@ -67,7 +101,6 @@ export default function ControlPanel({
           {isConnected ? "Next" : "Start"}
         </button>
 
-        {/* Stop */}
         <button
           onClick={onStop}
           className="flex-1 min-w-[100px] h-12 rounded-xl font-display font-semibold text-sm tracking-tight
@@ -79,7 +112,6 @@ export default function ControlPanel({
           Stop
         </button>
 
-        {/* Camera */}
         <button
           onClick={onToggleCamera}
           title={cameraOn ? "Turn off camera" : "Turn on camera"}
@@ -92,7 +124,6 @@ export default function ControlPanel({
           {cameraOn ? <Video className="w-4.5 h-4.5" /> : <VideoOff className="w-4.5 h-4.5" />}
         </button>
 
-        {/* Mic */}
         <button
           onClick={onToggleMic}
           title={micOn ? "Mute" : "Unmute"}
@@ -105,11 +136,10 @@ export default function ControlPanel({
           {micOn ? <Mic className="w-4.5 h-4.5" /> : <MicOff className="w-4.5 h-4.5" />}
         </button>
 
-        {/* Country Selector */}
         <div className="relative flex-1 min-w-[120px]" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen((o) => !o)}
-            className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground 
+            className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground
               flex items-center justify-between gap-2 px-3.5
               shadow-sm hover:bg-secondary/80 transition-all duration-200"
           >
@@ -122,12 +152,11 @@ export default function ControlPanel({
 
           {dropdownOpen && (
             <div className="absolute bottom-full mb-1 left-0 w-full max-h-48 overflow-y-auto
-              rounded-xl bg-card border border-border shadow-lg z-50 py-1
-              animate-fade-in">
+              rounded-xl bg-card border border-border shadow-lg z-50 py-1 animate-fade-in">
               {COUNTRIES.map((c) => (
                 <button
                   key={c.code}
-                  onClick={() => { setCountry(c); setDropdownOpen(false); }}
+                  onClick={() => { onCountryChange(c); setDropdownOpen(false); }}
                   className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors
                     ${c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"}`}
                 >
@@ -139,10 +168,9 @@ export default function ControlPanel({
           )}
         </div>
 
-        {/* Gender Selector */}
         <div className="h-12 rounded-xl bg-secondary shadow-sm flex items-center p-1 gap-0.5">
           <button
-            onClick={() => setGender("boy")}
+            onClick={() => onGenderChange("boy")}
             className={`h-full px-3.5 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all duration-300
               ${gender === "boy"
                 ? "bg-primary/15 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.2)]"
@@ -153,7 +181,7 @@ export default function ControlPanel({
             <span className="hidden sm:inline text-xs">I am</span>
           </button>
           <button
-            onClick={() => setGender("girl")}
+            onClick={() => onGenderChange("girl")}
             className={`h-full px-3.5 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all duration-300
               ${gender === "girl"
                 ? "bg-[hsl(330_70%_50%/0.15)] text-[hsl(330_70%_55%)] shadow-[0_0_10px_hsl(330_70%_50%/0.2)]"
