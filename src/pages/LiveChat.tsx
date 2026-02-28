@@ -257,10 +257,11 @@ export default function LiveChat() {
           <button
             onClick={handleNext}
             className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
-              bg-[hsl(142_70%_42%)] text-[hsl(0_0%_100%)]
-              shadow-[0_2px_16px_hsl(142_70%_42%/0.35)]
-              hover:shadow-[0_4px_24px_hsl(142_70%_42%/0.5)] hover:brightness-110
-              active:scale-[0.97] transition-all duration-200"
+              bg-primary text-primary-foreground
+              shadow-[0_2px_16px_hsl(var(--primary)/0.35)]
+              hover:-translate-y-0.5 hover:shadow-[0_6px_24px_hsl(var(--primary)/0.45)] hover:brightness-110
+              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
+              transition-all duration-200 ease-out"
           >
             {chatEnabled ? "Next" : "Start"}
           </button>
@@ -271,8 +272,9 @@ export default function LiveChat() {
             className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
               bg-destructive/80 text-destructive-foreground
               shadow-[0_2px_12px_hsl(var(--destructive)/0.25)]
-              hover:shadow-[0_4px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
-              active:scale-[0.97] transition-all duration-200"
+              hover:-translate-y-0.5 hover:shadow-[0_6px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
+              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--destructive)/0.2)]
+              transition-all duration-200 ease-out"
           >
             Stop
           </button>
@@ -281,11 +283,14 @@ export default function LiveChat() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((o) => !o)}
-              className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
-                hover:bg-muted transition-all duration-200 border border-border/20"
+              className="h-16 w-28 rounded-xl bg-primary/80 text-primary-foreground flex flex-col items-center justify-center gap-1
+                shadow-[0_2px_12px_hsl(var(--primary)/0.2)] border border-primary/30
+                hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)]
+                active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--primary)/0.15)]
+                transition-all duration-200 ease-out"
             >
               <span className="text-2xl leading-none">{country.flag}</span>
-              <span className="text-[11px] font-medium text-muted-foreground">Country</span>
+              <span className="text-[11px] font-medium text-primary-foreground/70">Country</span>
             </button>
             {dropdownOpen && (
               <div className="absolute bottom-full mb-2 left-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
@@ -308,21 +313,25 @@ export default function LiveChat() {
           {/* Gender */}
           <button
             onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
-            className="h-16 w-28 rounded-xl bg-muted/80 text-foreground flex flex-col items-center justify-center gap-1
-              hover:bg-muted transition-all duration-200 border border-border/20"
+            className="h-16 w-28 rounded-xl bg-primary/80 text-primary-foreground flex flex-col items-center justify-center gap-1
+              shadow-[0_2px_12px_hsl(var(--primary)/0.2)] border border-primary/30
+              hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)]
+              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_hsl(var(--primary)/0.15)]
+              transition-all duration-200 ease-out"
           >
             <span className="text-2xl leading-none">{gender === "boy" ? "👦" : "👧"}</span>
-            <span className="text-[11px] font-medium text-muted-foreground">I am</span>
+            <span className="text-[11px] font-medium text-primary-foreground/70">I am</span>
           </button>
 
           {/* Camera */}
           <button
             onClick={toggleCamera}
             title={cameraOn ? "Turn off camera" : "Turn on camera"}
-            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
+            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1
+              border transition-all duration-200 ease-out
               ${!cameraOn
-                ? "bg-destructive/20 text-destructive"
-                : "bg-muted/80 text-foreground hover:bg-muted"
+                ? "bg-destructive/20 text-destructive border-destructive/30"
+                : "bg-primary/80 text-primary-foreground border-primary/30 shadow-[0_2px_12px_hsl(var(--primary)/0.2)] hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)] active:translate-y-0 active:scale-[0.97]"
               }`}
           >
             {cameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
@@ -332,10 +341,11 @@ export default function LiveChat() {
           <button
             onClick={toggleMic}
             title={micOn ? "Mute" : "Unmute"}
-            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 border border-border/20
+            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1
+              border transition-all duration-200 ease-out
               ${!micOn
-                ? "bg-destructive/20 text-destructive"
-                : "bg-muted/80 text-foreground hover:bg-muted"
+                ? "bg-destructive/20 text-destructive border-destructive/30"
+                : "bg-primary/80 text-primary-foreground border-primary/30 shadow-[0_2px_12px_hsl(var(--primary)/0.2)] hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_6px_20px_hsl(var(--primary)/0.35)] active:translate-y-0 active:scale-[0.97]"
               }`}
           >
             {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
