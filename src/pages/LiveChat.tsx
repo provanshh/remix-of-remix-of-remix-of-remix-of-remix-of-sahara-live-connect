@@ -8,6 +8,7 @@ import FilterBottomSheet from "@/components/FilterBottomSheet";
 import UnlockFiltersModal from "@/components/UnlockFiltersModal";
 import FreeMatchAdModal from "@/components/FreeMatchAdModal";
 import CoinShopModal from "@/components/CoinShopModal";
+import SubscriptionPromptModal from "@/components/SubscriptionPromptModal";
 import saharaLogo from "@/assets/sahara-logo.png";
 
 const COUNTRIES = [
@@ -75,6 +76,10 @@ export default function LiveChat() {
   const [storeShopOpen, setStoreShopOpen] = useState(false);
   const [freeMatchAdOpen, setFreeMatchAdOpen] = useState(false);
   const [freeUnlockTimer, setFreeUnlockTimer] = useState<number | null>(null);
+  const [freeMatchUses, setFreeMatchUses] = useState(0);
+  const [freeMatchCooldownEnd, setFreeMatchCooldownEnd] = useState<number | null>(null);
+  const [freeMatchCooldownDisplay, setFreeMatchCooldownDisplay] = useState<string | null>(null);
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [callSeconds, setCallSeconds] = useState(0);
@@ -270,13 +275,64 @@ export default function LiveChat() {
     return () => clearTimeout(t);
   }, [freeUnlockTimer]);
 
+  // Cooldown timer display
+  useEffect(() => {
+    if (freeMatchCooldownEnd === null) {
+      setFreeMatchCooldownDisplay(null);
+      return;
+    }
+    const update = () => {
+      const remaining = Math.max(0, Math.ceil((freeMatchCooldownEnd - Date.now()) / 1000));
+      if (remaining <= 0) {
+        setFreeMatchCooldownEnd(null);
+        setFreeMatchCooldownDisplay(null);
+        return;
+      }
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      setFreeMatchCooldownDisplay(`${m}:${s.toString().padStart(2, "0")}`);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [freeMatchCooldownEnd]);
+
+  const handleFreeMatchClick = useCallback(() => {
+    // After 5 total uses (4 regular + 1 hourly), show subscription
+    if (freeMatchUses >= 5) {
+      setSubscriptionModalOpen(true);
+      return;
+    }
+    // If cooldown active, show toast
+    if (freeMatchCooldownEnd && Date.now() < freeMatchCooldownEnd) {
+      import("sonner").then(({ toast }) => toast.error("FreeMatch is on cooldown. Please wait!"));
+      return;
+    }
+    setFreeMatchAdOpen(true);
+  }, [freeMatchUses, freeMatchCooldownEnd]);
+
   const handleFreeAdComplete = useCallback(() => {
     setFreeMatchAdOpen(false);
     setFiltersUnlocked(true);
     setFreeUnlockTimer(60);
     setFilterSheetOpen(true);
-    import("sonner").then(({ toast }) => toast.success("Filters unlocked for 1 minute!"));
-  }, []);
+
+    const newUses = freeMatchUses + 1;
+    setFreeMatchUses(newUses);
+
+    if (newUses < 4) {
+      // 2-minute cooldown
+      setFreeMatchCooldownEnd(Date.now() + 2 * 60 * 1000);
+      import("sonner").then(({ toast }) => toast.success("Filters unlocked for 1 minute! Next FreeMatch in 2 min."));
+    } else if (newUses === 4) {
+      // 1-hour cooldown for the final attempt
+      setFreeMatchCooldownEnd(Date.now() + 60 * 60 * 1000);
+      import("sonner").then(({ toast }) => toast.success("Filters unlocked! Last free attempt available in 1 hour."));
+    } else {
+      // 5th use done — no more free matches
+      import("sonner").then(({ toast }) => toast.success("Filters unlocked! This was your last free match."));
+    }
+  }, [freeMatchUses]);
 
   const toggleCamera = useCallback(() => {
     localStreamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
@@ -332,10 +388,25 @@ export default function LiveChat() {
               {formatTime(callSeconds)}
             </div>
           )}
-          <button onClick={() => setFreeMatchAdOpen(true)} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all relative overflow-hidden">
-            FreeMatch
-            {freeUnlockTimer !== null && (
+          <button
+            onClick={handleFreeMatchClick}
+            className={`flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-all relative overflow-hidden ${
+              freeMatchCooldownDisplay
+                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                : freeMatchUses >= 5
+                  ? "bg-gradient-to-r from-amber-500 to-primary text-primary-foreground hover:brightness-110"
+                  : "bg-primary text-primary-foreground hover:brightness-110"
+            }`}
+          >
+            {freeMatchUses >= 5 ? "Upgrade" : "FreeMatch"}
+            {freeMatchCooldownDisplay && (
+              <span className="ml-1 text-xs opacity-80">({freeMatchCooldownDisplay})</span>
+            )}
+            {freeUnlockTimer !== null && !freeMatchCooldownDisplay && (
               <span className="ml-1 text-xs opacity-80">({freeUnlockTimer}s)</span>
+            )}
+            {freeMatchUses > 0 && freeMatchUses < 5 && !freeMatchCooldownDisplay && freeUnlockTimer === null && (
+              <span className="ml-1 text-[10px] opacity-60">{freeMatchUses}/{freeMatchUses <= 4 ? 4 : 5}</span>
             )}
           </button>
           <button onClick={() => setStoreShopOpen(true)} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
@@ -704,6 +775,7 @@ export default function LiveChat() {
       />
       <CoinShopModal open={storeShopOpen} onClose={() => setStoreShopOpen(false)} coinBalance={coinBalance} />
       <FreeMatchAdModal open={freeMatchAdOpen} onClose={() => setFreeMatchAdOpen(false)} onAdComplete={handleFreeAdComplete} />
+      <SubscriptionPromptModal open={subscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
     </div>
   );
 }
