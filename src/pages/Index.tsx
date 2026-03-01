@@ -6,6 +6,7 @@ import ParticleBackground from "@/components/ParticleBackground";
 import StatsCounter from "@/components/StatsCounter";
 import AutoScrollCarousel from "@/components/AutoScrollCarousel";
 import CoinShopModal from "@/components/CoinShopModal";
+import LandingInfoSection from "@/components/LandingInfoSection";
 
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
@@ -233,6 +234,7 @@ export default function LandingPage() {
           <AutoScrollCarousel profiles={PROFILES} />
         </div>
       </div>
+      <LandingInfoSection />
       <CoinShopModal open={shopOpen} onClose={() => setShopOpen(false)} coinBalance={0} />
     </div>
   );
