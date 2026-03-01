@@ -72,24 +72,24 @@ export default function LandingPage() {
       <ParticleBackground />
 
       {/* ═══ Top Nav ═══ */}
-      <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
-        <div className="flex items-center gap-8">
-          <span className="flex items-center">
-            <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
-          </span>
-          {/* Nav links - grouped with logo */}
-          <div className="hidden md:flex items-center gap-6">
-            <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-foreground hover:text-primary transition-colors pb-0.5">
-              Video Chat
-            </button>
-            <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
-              Messages
-            </button>
-            <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
-              About
-            </button>
-          </div>
+      <nav className="relative z-20 flex items-center px-6 lg:px-10 py-5">
+        <span className="flex items-center">
+          <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
+        </span>
+
+        {/* Nav links - centered between logo and right section */}
+        <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+          <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-foreground hover:text-primary transition-colors pb-0.5">
+            Video Chat
+          </button>
+          <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+            Messages
+          </button>
+          <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+            About
+          </button>
         </div>
+
         <div className="flex items-center gap-3 md:gap-4">
           {/* Shop & History */}
           <div className="hidden md:flex items-center gap-2">
