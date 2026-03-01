@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import MatchRevealOverlay from "@/components/MatchRevealOverlay";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 import UnlockFiltersModal from "@/components/UnlockFiltersModal";
+import CoinShopModal from "@/components/CoinShopModal";
 
 const COUNTRIES = [
   { code: "US", name: "USA", flag: "🇺🇸" },
@@ -56,6 +57,7 @@ export default function LiveChat() {
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [filtersUnlocked, setFiltersUnlocked] = useState(false);
   const [coinBalance] = useState(100); // from wallet
+  const [storeShopOpen, setStoreShopOpen] = useState(false);
 
   const chatEnabled = connectionState === "connected";
 
@@ -198,7 +200,7 @@ export default function LiveChat() {
           <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
             FreeMatch
           </button>
-          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
+          <button onClick={() => setStoreShopOpen(true)} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
             Store
           </button>
           <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
@@ -528,6 +530,7 @@ export default function LiveChat() {
         coinBalance={coinBalance}
         onUnlock={() => { setFiltersUnlocked(true); setUnlockModalOpen(false); setFilterSheetOpen(true); }}
       />
+      <CoinShopModal open={storeShopOpen} onClose={() => setStoreShopOpen(false)} coinBalance={coinBalance} />
     </div>
   );
 }

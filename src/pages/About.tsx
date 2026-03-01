@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import FloatingCardsBackground from "@/components/FloatingCardsBackground";
+import CoinShopModal from "@/components/CoinShopModal";
 
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0);
@@ -48,6 +49,7 @@ export default function About() {
   const [showCounter, setShowCounter] = useState(false);
   const [showLabel, setShowLabel] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setShowBrand(true), 300);
@@ -79,7 +81,7 @@ export default function About() {
 
           <div className="hidden md:block w-px h-5 bg-border/30" />
 
-          <button className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
+          <button onClick={() => setShopOpen(true)} className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
             <ShoppingBag className="w-4 h-4 text-amber-400" />
             Shop
           </button>
@@ -148,6 +150,7 @@ export default function About() {
           </button>
         </div>
       </div>
+      <CoinShopModal open={shopOpen} onClose={() => setShopOpen(false)} coinBalance={0} />
     </div>
   );
 }
