@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, ArrowRight, Shield, Sparkles, LogOut, MessageCircle } from "lucide-react";
+import { Send, ArrowRight, Shield, Sparkles, LogOut, MessageCircle, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
 import { filterMessage } from "@/lib/profanityFilter";
 import { containsPersonalInfo } from "@/lib/privacyFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -158,6 +159,67 @@ export default function TextChat() {
     handleStartMatch();
   };
 
+  const handleDownloadChat = useCallback(() => {
+    if (messages.length === 0) return;
+    const doc = new jsPDF();
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 16;
+    const maxW = pageW - margin * 2;
+    let y = 20;
+
+    // Title
+    doc.setFontSize(18);
+    doc.setTextColor(0, 200, 180);
+    doc.text("Sahara Chat Transcript", margin, y);
+    y += 8;
+
+    // Date
+    doc.setFontSize(9);
+    doc.setTextColor(120, 120, 120);
+    doc.text(new Date().toLocaleString(), margin, y);
+    y += 4;
+
+    // Divider line
+    doc.setDrawColor(0, 200, 180);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageW - margin, y);
+    y += 10;
+
+    doc.setFontSize(10);
+
+    messages.forEach((msg) => {
+      // Check page overflow
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+
+      if (msg.sender === "system") {
+        doc.setTextColor(130, 130, 130);
+        doc.setFont("helvetica", "italic");
+        const lines = doc.splitTextToSize(`[System] ${msg.text}`, maxW);
+        doc.text(lines, margin, y);
+        y += lines.length * 5 + 4;
+      } else {
+        const label = msg.sender === "me" ? (myAvatar?.label || "You") : (strangerAvatar?.label || "Stranger");
+        if (msg.sender === "me") {
+          doc.setTextColor(0, 180, 160);
+        } else {
+          doc.setTextColor(80, 80, 80);
+        }
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, margin, y);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(40, 40, 40);
+        const lines = doc.splitTextToSize(msg.text, maxW - 4);
+        doc.text(lines, margin + 4, y + 5);
+        y += lines.length * 5 + 8;
+      }
+    });
+
+    doc.save(`sahara-chat-${Date.now()}.pdf`);
+  }, [messages, myAvatar, strangerAvatar]);
+
   // Avatar selection screen
   if (!myAvatar) {
     return <AvatarSelector onSelect={(av) => setMyAvatar(av)} />;
@@ -294,9 +356,21 @@ export default function TextChat() {
         {/* RIGHT — Chat Sidebar */}
         <div className="hidden lg:flex w-80 shrink-0 flex-col rounded-2xl border border-primary/20 shadow-[inset_0_0_1px_hsl(var(--primary)/0.3),0_0_6px_hsl(var(--primary)/0.1)] bg-card overflow-hidden">
           {/* Chat header */}
-          <div className="px-5 py-3 border-b border-border/30 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live Chat</span>
+          <div className="px-5 py-3 border-b border-border/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live Chat</span>
+            </div>
+            {messages.filter(m => m.sender !== "system").length > 0 && (
+              <button
+                onClick={handleDownloadChat}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider text-primary border border-primary/30 hover:bg-primary/10 transition-all"
+                title="Download chat as PDF"
+              >
+                <Download className="w-3 h-3" />
+                PDF
+              </button>
+            )}
           </div>
 
           {/* Messages area */}
