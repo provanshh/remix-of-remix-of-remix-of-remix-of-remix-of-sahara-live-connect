@@ -7,6 +7,7 @@ import StatsCounter from "@/components/StatsCounter";
 import AutoScrollCarousel from "@/components/AutoScrollCarousel";
 import CoinShopModal from "@/components/CoinShopModal";
 import LandingInfoSection from "@/components/LandingInfoSection";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
@@ -72,8 +73,8 @@ export default function LandingPage() {
 
       {/* ═══ Top Nav ═══ */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
-        <span className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
-          Sahara
+        <span className="flex items-center">
+          <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
         </span>
         <div className="flex items-center gap-3 md:gap-5">
           {/* Nav links */}

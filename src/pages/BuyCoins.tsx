@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Coins, ArrowLeft, X, ShieldCheck, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 const packages = [
   { id: "p1", coins: 550, bonus: 50, price: 400, popular: false },
@@ -87,8 +88,8 @@ export default function BuyCoins() {
 
       {/* Nav */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
-        <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
-          Sahara
+        <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity">
+          <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
         </button>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-semibold text-foreground">

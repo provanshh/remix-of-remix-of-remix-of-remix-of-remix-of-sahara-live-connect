@@ -7,6 +7,7 @@ import MatchRevealOverlay from "@/components/MatchRevealOverlay";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 import UnlockFiltersModal from "@/components/UnlockFiltersModal";
 import CoinShopModal from "@/components/CoinShopModal";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 const COUNTRIES = [
   { code: "US", name: "USA", flag: "🇺🇸" },
@@ -291,8 +292,8 @@ export default function LiveChat() {
       {/* ═══ Top Navigation Bar ═══ */}
       <nav className="flex items-center justify-between px-5 lg:px-8 py-3 shrink-0 z-50 border-b border-border/30">
         <div className="flex items-center gap-6 lg:gap-10">
-          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold sahara-shine tracking-tight">
-            Sahara
+          <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity">
+            <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
           </button>
           <div className="hidden sm:flex items-center gap-6">
             <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5 uppercase tracking-wider">Video Chat</span>

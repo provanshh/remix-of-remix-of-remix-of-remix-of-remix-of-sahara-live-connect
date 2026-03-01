@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Lock, Unlock, Clock, Coins, ArrowLeft } from "lucide-react";
 import UnlockModal from "@/components/UnlockModal";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 interface ChatEntry {
   id: string;
@@ -81,8 +82,8 @@ export default function History() {
       {/* Nav */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight hover:opacity-80 transition-opacity">
-            Sahara
+          <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity">
+            <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
           </button>
         </div>
         <div className="flex items-center gap-4">
