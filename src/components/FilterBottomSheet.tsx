@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { X, Lock, ChevronRight, Globe, Languages, MapPin, Users } from "lucide-react";
+import { X, Lock, ChevronRight, ChevronDown, Languages, MapPin, Users, Check } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 const REGIONS = [
   "North Africa", "Middle East", "Southeast Asia", "Europe",
   "South America", "East Asia", "North America", "Oceania"
 ];
+
+const LANGUAGES = [
+  "English", "Arabic", "Spanish", "French", "Hindi", "Mandarin", "Japanese", "Korean", "Portuguese", "German"
+];
+
+type RegionPref = "default" | "prefer_more" | "prefer_less";
 
 interface FilterBottomSheetProps {
   open: boolean;
@@ -14,12 +21,30 @@ interface FilterBottomSheetProps {
 }
 
 export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlocked }: FilterBottomSheetProps) {
-  const [ageRange] = useState([18, 35]);
+  const [ageRange, setAgeRange] = useState([18, 35]);
+  const [regionPrefs, setRegionPrefs] = useState<Record<string, RegionPref>>(
+    () => Object.fromEntries(REGIONS.map(r => [r, "default" as RegionPref]))
+  );
+  const [openRegionMenu, setOpenRegionMenu] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("Unlimited");
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
 
   if (!open) return null;
 
   const handleFilterTap = () => {
     if (!unlocked) onUnlockRequest();
+  };
+
+  const prefLabel = (pref: RegionPref) => {
+    if (pref === "prefer_more") return "Prefer More";
+    if (pref === "prefer_less") return "Prefer Less";
+    return "Default";
+  };
+
+  const prefColor = (pref: RegionPref) => {
+    if (pref === "prefer_more") return "text-primary";
+    if (pref === "prefer_less") return "text-amber-400";
+    return "text-muted-foreground";
   };
 
   return (
@@ -50,7 +75,7 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
           </button>
         </div>
 
-        {/* Filter Options — locked overlay */}
+        {/* Filter Options */}
         <div className="px-6 space-y-4 relative">
           {!unlocked && (
             <div className="absolute inset-0 z-10 cursor-pointer" onClick={handleFilterTap} />
@@ -58,19 +83,28 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
 
           {/* Age Range */}
           <div className={`relative ${!unlocked ? "opacity-60 blur-[1.5px]" : ""} transition-all`}>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <Users className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold text-foreground">Age Range</span>
-              <span className="text-xs text-muted-foreground ml-auto">{ageRange[0]}–{ageRange[1]}+</span>
+              <span className="text-xs text-muted-foreground ml-auto">{ageRange[0]}–{ageRange[1] >= 35 ? "35+" : ageRange[1]}</span>
             </div>
-            <div className="relative h-2 rounded-full bg-muted">
-              <div
-                className="absolute h-full rounded-full bg-gradient-to-r from-primary to-accent"
-                style={{ left: "0%", right: "0%" }}
+            {unlocked ? (
+              <Slider
+                value={ageRange}
+                onValueChange={setAgeRange}
+                min={18}
+                max={35}
+                step={1}
+                minStepsBetweenThumbs={1}
+                className="w-full"
               />
-              <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg" />
-              <div className="absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg" />
-            </div>
+            ) : (
+              <div className="relative h-2 rounded-full bg-muted">
+                <div className="absolute h-full rounded-full bg-gradient-to-r from-primary to-accent" style={{ left: "0%", right: "0%" }} />
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg" />
+                <div className="absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg" />
+              </div>
+            )}
             <div className="flex justify-between mt-1">
               <span className="text-[10px] text-muted-foreground">18</span>
               <span className="text-[10px] text-muted-foreground">35+</span>
@@ -83,12 +117,35 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
               <Languages className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold text-foreground">Language</span>
             </div>
-            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-muted/40 border border-border/30">
-              <span className="text-sm text-muted-foreground">Language</span>
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <span className="text-sm">Unlimited</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
+            <div className="relative">
+              <button
+                onClick={() => unlocked && setLangMenuOpen(v => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-muted/40 border border-border/30 hover:border-primary/30 transition-colors"
+              >
+                <span className="text-sm text-foreground">{selectedLanguage}</span>
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${langMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+              {langMenuOpen && unlocked && (
+                <div className="absolute top-full mt-1 left-0 w-full rounded-xl bg-card border border-border shadow-xl z-20 py-1 max-h-48 overflow-y-auto chat-scrollbar animate-fade-in">
+                  <button
+                    onClick={() => { setSelectedLanguage("Unlimited"); setLangMenuOpen(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${selectedLanguage === "Unlimited" ? "text-primary" : "text-foreground"}`}
+                  >
+                    <span>Unlimited</span>
+                    {selectedLanguage === "Unlimited" && <Check className="w-3.5 h-3.5 text-primary" />}
+                  </button>
+                  {LANGUAGES.map(lang => (
+                    <button
+                      key={lang}
+                      onClick={() => { setSelectedLanguage(lang); setLangMenuOpen(false); }}
+                      className={`w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${selectedLanguage === lang ? "text-primary" : "text-foreground"}`}
+                    >
+                      <span>{lang}</span>
+                      {selectedLanguage === lang && <Check className="w-3.5 h-3.5 text-primary" />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -100,12 +157,36 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
             </div>
             <div className="max-h-36 overflow-y-auto chat-scrollbar space-y-1.5">
               {REGIONS.map((region) => (
-                <div key={region} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-muted/40 border border-border/30">
-                  <span className="text-sm text-foreground">{region}</span>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <span className="text-xs">Default</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </div>
+                <div key={region} className="relative">
+                  <button
+                    onClick={() => unlocked && setOpenRegionMenu(v => v === region ? null : region)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-muted/40 border border-border/30 hover:border-primary/30 transition-colors"
+                  >
+                    <span className="text-sm text-foreground">{region}</span>
+                    <div className="flex items-center gap-1">
+                      <span className={`text-xs font-medium ${prefColor(regionPrefs[region])}`}>
+                        {prefLabel(regionPrefs[region])}
+                      </span>
+                      <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${openRegionMenu === region ? "rotate-90" : ""}`} />
+                    </div>
+                  </button>
+                  {openRegionMenu === region && unlocked && (
+                    <div className="absolute right-0 top-full mt-1 w-44 rounded-xl bg-card border border-border shadow-xl z-20 py-1 animate-fade-in">
+                      {(["default", "prefer_more", "prefer_less"] as RegionPref[]).map(pref => (
+                        <button
+                          key={pref}
+                          onClick={() => {
+                            setRegionPrefs(prev => ({ ...prev, [region]: pref }));
+                            setOpenRegionMenu(null);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${regionPrefs[region] === pref ? "text-primary" : "text-foreground"}`}
+                        >
+                          <span>{prefLabel(pref)}</span>
+                          {regionPrefs[region] === pref && <Check className="w-3.5 h-3.5 text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
