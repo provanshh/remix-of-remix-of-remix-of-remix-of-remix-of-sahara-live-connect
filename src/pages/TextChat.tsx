@@ -292,7 +292,7 @@ export default function TextChat() {
         </div>
 
         {/* RIGHT — Chat Sidebar */}
-        <div className="hidden lg:flex w-80 shrink-0 flex-col rounded-2xl border border-border/20 bg-card overflow-hidden">
+        <div className="hidden lg:flex w-80 shrink-0 flex-col rounded-2xl border border-primary/20 shadow-[inset_0_0_1px_hsl(var(--primary)/0.3),0_0_6px_hsl(var(--primary)/0.1)] bg-card overflow-hidden">
           {/* Chat header */}
           <div className="px-5 py-3 border-b border-border/30 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
