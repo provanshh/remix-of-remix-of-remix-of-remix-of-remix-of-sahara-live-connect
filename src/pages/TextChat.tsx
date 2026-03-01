@@ -365,19 +365,21 @@ export default function TextChat() {
             <div className="px-3 py-2.5 border-t border-border/30 flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setShowSuggestions((o) => !o)}
-                className="w-7 h-7 rounded-full flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 transition-all shrink-0"
+                className="w-7 h-7 rounded-full flex items-center justify-center border border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all shrink-0 shadow-[0_0_4px_hsl(var(--primary)/0.15)]"
                 title="Smart suggestions"
               >
                 <Sparkles className="w-3.5 h-3.5 text-primary" />
               </button>
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Type a message…"
-                className="flex-1 rounded-full px-3 py-1.5 text-xs bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
-              />
+              <div className="flex-1 flex items-center rounded-full border border-primary/30 shadow-[0_0_6px_hsl(var(--primary)/0.15)] bg-muted/20 px-2 py-0.5">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  placeholder="Type a message…"
+                  className="flex-1 rounded-full px-2 py-1 text-xs bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-colors"
+                />
+              </div>
               <button
                 onClick={handleSend}
                 disabled={!input.trim()}
@@ -425,16 +427,18 @@ export default function TextChat() {
         </div>
         {chatEnabled && (
           <div className="px-3 py-2.5 border-t border-border/30 flex items-center gap-2 shrink-0">
-            <button onClick={() => setShowSuggestions((o) => !o)} className="w-8 h-8 rounded-full flex items-center justify-center border border-border/40 hover:border-primary/40 shrink-0">
+            <button onClick={() => setShowSuggestions((o) => !o)} className="w-8 h-8 rounded-full flex items-center justify-center border border-primary/30 hover:border-primary/50 shrink-0 shadow-[0_0_4px_hsl(var(--primary)/0.15)]">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
             </button>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Type a message…"
-              className="flex-1 rounded-full px-4 py-2 text-sm bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
-            />
+            <div className="flex-1 flex items-center rounded-full border border-primary/30 shadow-[0_0_6px_hsl(var(--primary)/0.15)] bg-muted/20 px-2 py-0.5">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                placeholder="Type a message…"
+                className="flex-1 rounded-full px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-colors"
+              />
+            </div>
             <button onClick={handleSend} disabled={!input.trim()} className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 hover:brightness-110 disabled:opacity-30">
               <Send className="w-3.5 h-3.5" />
             </button>
