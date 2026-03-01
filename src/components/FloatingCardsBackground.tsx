@@ -1,81 +1,132 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-interface FloatingCard {
-  id: number;
+interface Card {
   x: number;
   y: number;
+  vx: number;
+  vy: number;
   size: number;
-  speed: number;
-  delay: number;
   blur: number;
   opacity: number;
   hue: number;
-  direction: number;
+  rotation: number;
+  rotationSpeed: number;
 }
 
 export default function FloatingCardsBackground() {
-  const [cards] = useState<FloatingCard[]>(() => {
-    const result: FloatingCard[] = [];
-    for (let i = 0; i < 18; i++) {
-      result.push({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 60 + Math.random() * 50,
-        speed: 15 + Math.random() * 25,
-        delay: Math.random() * -20,
-        blur: i < 6 ? 0 : i < 12 ? 2 : 5,
-        opacity: i < 6 ? 0.35 : i < 12 ? 0.2 : 0.1,
-        hue: 170 + Math.random() * 30,
-        direction: Math.random() > 0.5 ? 1 : -1,
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    let animId: number;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const cards: Card[] = Array.from({ length: 20 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.3,
+      size: 40 + Math.random() * 40,
+      blur: Math.random() < 0.3 ? 0 : Math.random() * 4 + 1,
+      opacity: 0.08 + Math.random() * 0.18,
+      hue: 170 + Math.random() * 30,
+      rotation: Math.random() * 20 - 10,
+      rotationSpeed: (Math.random() - 0.5) * 0.15,
+    }));
+
+    const drawCard = (c: Card) => {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((c.rotation * Math.PI) / 180);
+      ctx.globalAlpha = c.opacity;
+      if (c.blur > 0) ctx.filter = `blur(${c.blur}px)`;
+
+      const w = c.size;
+      const h = c.size * 1.4;
+      const r = 10;
+
+      // Card body
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, r);
+      ctx.fillStyle = `hsla(${c.hue}, 30%, 18%, 0.9)`;
+      ctx.fill();
+      ctx.strokeStyle = `hsla(${c.hue}, 60%, 45%, 0.2)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Avatar area
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h * 0.6, [r, r, 0, 0]);
+      ctx.fillStyle = `linear-gradient(hsla(${c.hue}, 40%, 25%, 1), hsla(${c.hue + 15}, 30%, 20%, 1))`;
+      ctx.fillStyle = `hsla(${c.hue}, 35%, 22%, 1)`;
+      ctx.fill();
+
+      // Text lines
+      ctx.fillStyle = `hsla(180, 20%, 70%, 0.15)`;
+      ctx.fillRect(-w / 2 + 8, h * 0.18, w * 0.6, 4);
+      ctx.fillRect(-w / 2 + 8, h * 0.18 + 8, w * 0.35, 3);
+
+      // Glow dot
+      ctx.beginPath();
+      ctx.arc(w / 2 - 10, -h / 2 + 10, 3, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(170, 80%, 50%, 0.5)`;
+      ctx.fill();
+
+      ctx.filter = "none";
+      ctx.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Subtle radial glow
+      const grad = ctx.createRadialGradient(
+        canvas.width * 0.4, canvas.height * 0.3, 0,
+        canvas.width * 0.4, canvas.height * 0.3, canvas.width * 0.5
+      );
+      grad.addColorStop(0, "hsla(180, 60%, 40%, 0.04)");
+      grad.addColorStop(1, "transparent");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      cards.forEach((c) => {
+        c.x += c.vx;
+        c.y += c.vy;
+        c.rotation += c.rotationSpeed;
+
+        // Wrap around edges
+        const margin = c.size;
+        if (c.x < -margin) c.x = canvas.width + margin;
+        if (c.x > canvas.width + margin) c.x = -margin;
+        if (c.y < -margin) c.y = canvas.height + margin;
+        if (c.y > canvas.height + margin) c.y = -margin;
+
+        drawCard(c);
       });
-    }
-    return result;
-  });
+
+      animId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-      {/* Dark gradient base */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-[hsl(var(--primary)/0.05)]" />
-      
-      {/* Radial glow accents */}
-      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] rounded-full bg-[hsl(var(--primary)/0.04)] blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[hsl(var(--glow-secondary)/0.03)] blur-[100px]" />
-
-      {/* Floating cards */}
-      {cards.map((card) => (
-        <div
-          key={card.id}
-          className="absolute rounded-2xl"
-          style={{
-            left: `${card.x}%`,
-            top: `${card.y}%`,
-            width: `${card.size}px`,
-            height: `${card.size * 1.35}px`,
-            filter: `blur(${card.blur}px)`,
-            opacity: card.opacity,
-            animation: `float-card-y ${card.speed}s ease-in-out ${card.delay}s infinite, float-card-x ${card.speed * 1.3}s ease-in-out ${card.delay}s infinite`,
-          }}
-        >
-          {/* Card shell */}
-          <div className="w-full h-full rounded-2xl overflow-hidden border border-[hsl(var(--primary)/0.15)] bg-gradient-to-b from-[hsl(var(--secondary)/0.8)] to-[hsl(var(--card)/0.6)] shadow-[0_0_20px_hsl(var(--primary)/0.08)]">
-            {/* Fake avatar area */}
-            <div
-              className="w-full h-[65%] rounded-t-2xl"
-              style={{
-                background: `linear-gradient(135deg, hsl(${card.hue} 40% 25%), hsl(${card.hue + 20} 30% 18%))`,
-              }}
-            />
-            {/* Fake text lines */}
-            <div className="p-2 space-y-1.5">
-              <div className="h-2 w-3/4 rounded-full bg-[hsl(var(--foreground)/0.12)]" />
-              <div className="h-1.5 w-1/2 rounded-full bg-[hsl(var(--foreground)/0.07)]" />
-            </div>
-            {/* Subtle glow dot */}
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[hsl(var(--primary)/0.4)]" />
-          </div>
-        </div>
-      ))}
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 z-0 pointer-events-none"
+      aria-hidden="true"
+    />
   );
 }
