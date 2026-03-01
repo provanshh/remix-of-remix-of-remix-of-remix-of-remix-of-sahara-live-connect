@@ -479,6 +479,16 @@ export default function LiveChat() {
             </>
           )}
         </button>
+
+        {/* End button — return to landing page */}
+        <button
+          onClick={handleEnd}
+          className="flex-1 max-w-[140px] flex items-center justify-center gap-2 py-3.5 rounded-xl bg-destructive/80 text-destructive-foreground font-display font-bold text-sm tracking-tight
+            shadow-[0_2px_12px_hsl(var(--destructive)/0.25)] hover:shadow-[0_4px_20px_hsl(var(--destructive)/0.4)] hover:brightness-110
+            active:scale-[0.96] transition-all duration-200"
+        >
+          End
+        </button>
       </div>
     </div>
   );
