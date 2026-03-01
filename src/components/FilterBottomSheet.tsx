@@ -12,6 +12,7 @@ const LANGUAGES = [
 ];
 
 type RegionPref = "default" | "prefer_more" | "prefer_less";
+type GenderPref = "any" | "male" | "female";
 
 interface FilterBottomSheetProps {
   open: boolean;
@@ -28,6 +29,7 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
   const [openRegionMenu, setOpenRegionMenu] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("Unlimited");
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [genderPref, setGenderPref] = useState<GenderPref>("any");
 
   if (!open) return null;
 
@@ -111,7 +113,34 @@ export default function FilterBottomSheet({ open, onClose, onUnlockRequest, unlo
             </div>
           </div>
 
-          {/* Language */}
+          {/* Gender */}
+          <div className={`relative ${!unlocked ? "opacity-60 blur-[1.5px]" : ""} transition-all`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">Gender</span>
+            </div>
+            <div className="flex gap-2">
+              {([
+                { value: "any" as GenderPref, label: "Anyone", emoji: "🌍" },
+                { value: "male" as GenderPref, label: "Male", emoji: "♂️" },
+                { value: "female" as GenderPref, label: "Female", emoji: "♀️" },
+              ]).map(({ value, label, emoji }) => (
+                <button
+                  key={value}
+                  onClick={() => unlocked && setGenderPref(value)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    genderPref === value
+                      ? "bg-primary/15 border-2 border-primary/50 text-primary shadow-[0_0_12px_hsl(var(--primary)/0.15)]"
+                      : "bg-muted/40 border border-border/30 text-muted-foreground hover:border-primary/20"
+                  }`}
+                >
+                  <span>{emoji}</span>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className={`relative ${!unlocked ? "opacity-60 blur-[1.5px]" : ""} transition-all`}>
             <div className="flex items-center gap-2 mb-2">
               <Languages className="w-4 h-4 text-primary" />
