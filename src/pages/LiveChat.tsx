@@ -307,15 +307,19 @@ export default function LiveChat() {
 
         {/* RIGHT — Sidebar */}
         <div className="hidden lg:flex w-72 shrink-0 flex-col rounded-2xl border border-border/20 bg-card p-5 gap-4">
-          <p className="text-foreground text-sm leading-relaxed">
-            Ready to chat with new friends worldwide? Start matching for an enjoyable and fun communication experience! 🌍 💬
-          </p>
-          <button
-            onClick={handleStartMatch}
-            className="w-fit px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 active:scale-95 transition-all"
-          >
-            New Chat
-          </button>
+          {!chatEnabled && (
+            <>
+              <p className="text-foreground text-sm leading-relaxed">
+                Ready to chat with new friends worldwide? Start matching for an enjoyable and fun communication experience! 🌍 💬
+              </p>
+              <button
+                onClick={handleStartMatch}
+                className="w-fit px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 active:scale-95 transition-all"
+              >
+                New Chat
+              </button>
+            </>
+          )}
 
           {/* Quick chat panel in sidebar */}
           {chatEnabled && (
