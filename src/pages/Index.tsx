@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import ParticleBackground from "@/components/ParticleBackground";
 import StatsCounter from "@/components/StatsCounter";
 import AutoScrollCarousel from "@/components/AutoScrollCarousel";
+import CoinShopModal from "@/components/CoinShopModal";
 
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
@@ -42,6 +43,7 @@ export default function LandingPage() {
   const [genderOpen, setGenderOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [onlineCount, setOnlineCount] = useState(179545);
+  const [shopOpen, setShopOpen] = useState(false);
   const genderRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +90,7 @@ export default function LandingPage() {
           <div className="hidden md:block w-px h-5 bg-border/30" />
 
           {/* Shop */}
-          <button className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
+          <button onClick={() => setShopOpen(true)} className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
             <ShoppingBag className="w-4 h-4 text-amber-400" />
             Shop
           </button>
@@ -231,6 +233,7 @@ export default function LandingPage() {
           <AutoScrollCarousel profiles={PROFILES} />
         </div>
       </div>
+      <CoinShopModal open={shopOpen} onClose={() => setShopOpen(false)} coinBalance={0} />
     </div>
   );
 }
