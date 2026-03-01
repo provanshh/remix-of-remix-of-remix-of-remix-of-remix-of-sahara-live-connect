@@ -213,7 +213,7 @@ export default function LiveChat() {
       {/* ═══ Main Content: Videos + Sidebar ═══ */}
       <div className="flex-1 flex min-h-0 p-3 gap-3">
         {/* LEFT — Local Camera (You) */}
-        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-black border border-border/20">
+        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-black border border-primary/30 shadow-[inset_0_0_1px_hsl(var(--primary)/0.5),0_0_8px_hsl(var(--primary)/0.15)]">
           <video
             ref={localVideoRef}
             autoPlay
@@ -248,7 +248,7 @@ export default function LiveChat() {
         </div>
 
         {/* CENTER — Stranger */}
-        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-card border border-border/20">
+        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-card border border-primary/30 shadow-[inset_0_0_1px_hsl(var(--primary)/0.5),0_0_8px_hsl(var(--primary)/0.15)]">
           <video
             ref={remoteVideoRef}
             autoPlay
