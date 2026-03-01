@@ -314,7 +314,7 @@ export default function LiveChat() {
         </div>
 
         {/* RIGHT — Sidebar */}
-        <div className="hidden lg:flex w-72 shrink-0 flex-col rounded-2xl border border-border/20 bg-card p-5 gap-4">
+        <div className="hidden lg:flex w-72 shrink-0 flex-col rounded-2xl border border-primary/20 shadow-[inset_0_0_1px_hsl(var(--primary)/0.3),0_0_6px_hsl(var(--primary)/0.1)] bg-card p-5 gap-4">
           {!chatEnabled && (
             <>
               <p className="text-foreground text-sm leading-relaxed">
@@ -384,7 +384,7 @@ export default function LiveChat() {
 
       {/* ═══ Chat Overlay for mobile ═══ */}
       {chatOpen && (
-        <div className="lg:hidden absolute bottom-20 right-4 z-50 w-80 h-96 rounded-2xl glass-strong shadow-2xl flex flex-col overflow-hidden border border-primary/20 animate-fade-in">
+        <div className="lg:hidden absolute bottom-20 right-4 z-50 w-80 h-96 rounded-2xl glass-strong shadow-2xl flex flex-col overflow-hidden border border-primary/20 shadow-[inset_0_0_1px_hsl(var(--primary)/0.3),0_0_6px_hsl(var(--primary)/0.1)] animate-fade-in">
           <div className="px-4 py-2.5 border-b border-border/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
