@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -27,6 +27,19 @@ type Country = (typeof COUNTRIES)[number];
 type Gender = "boy" | "girl";
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
 type ConnectionState = "searching" | "revealing" | "connected";
+
+const ICEBREAKER_TIPS = [
+  "💡 Try asking about their favorite travel destination!",
+  "💡 Ask what music they're listening to lately!",
+  "💡 Share something funny that happened to you today!",
+  "💡 Ask about their dream superpower — it's always fun!",
+  "💡 Try: \"What's the best meal you've ever had?\"",
+  "💡 Ask: \"If you could live in any movie world, which one?\"",
+  "💡 Try: \"What's a skill you wish you had?\"",
+  "💡 Ask them about a hobby they're passionate about!",
+  "💡 Share your favorite meme genre — bond over humor!",
+  "💡 Try: \"What's the last thing that made you laugh?\"",
+];
 
 export default function LiveChat() {
   const navigate = useNavigate();
@@ -58,6 +71,9 @@ export default function LiveChat() {
   const [filtersUnlocked, setFiltersUnlocked] = useState(false);
   const [coinBalance] = useState(100); // from wallet
   const [storeShopOpen, setStoreShopOpen] = useState(false);
+  const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
+  const lastMessageTimeRef = useRef<number>(0);
+  const icebreakerIndexRef = useRef(0);
 
   const chatEnabled = connectionState === "connected";
 
@@ -81,6 +97,42 @@ export default function LiveChat() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Track last message time for AI moderator
+  useEffect(() => {
+    if (messages.length > 0) lastMessageTimeRef.current = Date.now();
+  }, [messages]);
+
+  // AI Moderator: show icebreaker on connect + every 20s of silence
+  useEffect(() => {
+    if (connectionState !== "connected") {
+      setIcebreakerTip(null);
+      return;
+    }
+
+    const initialTimer = setTimeout(() => {
+      const tip = ICEBREAKER_TIPS[icebreakerIndexRef.current % ICEBREAKER_TIPS.length];
+      icebreakerIndexRef.current++;
+      setIcebreakerTip(tip);
+      setTimeout(() => setIcebreakerTip((prev) => (prev === tip ? null : prev)), 8000);
+    }, 2000);
+
+    const silenceTimer = setInterval(() => {
+      const now = Date.now();
+      if (lastMessageTimeRef.current > 0 && now - lastMessageTimeRef.current >= 20000) {
+        const tip = ICEBREAKER_TIPS[icebreakerIndexRef.current % ICEBREAKER_TIPS.length];
+        icebreakerIndexRef.current++;
+        setIcebreakerTip(tip);
+        lastMessageTimeRef.current = now;
+        setTimeout(() => setIcebreakerTip((prev) => (prev === tip ? null : prev)), 8000);
+      }
+    }, 5000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(silenceTimer);
+    };
+  }, [connectionState]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -152,6 +204,9 @@ export default function LiveChat() {
     setMessages([]);
     setInput("");
     setChatOpen(false);
+    setIcebreakerTip(null);
+    icebreakerIndexRef.current = 0;
+    lastMessageTimeRef.current = 0;
     simulateMatch();
   }, [idle, clearRemote, simulateMatch, startLocalCamera]);
 
@@ -161,6 +216,9 @@ export default function LiveChat() {
     setHasStarted(false);
     setIdle(true);
     setMessages([]);
+    setIcebreakerTip(null);
+    icebreakerIndexRef.current = 0;
+    lastMessageTimeRef.current = 0;
   }, [clearRemote, stopLocalCamera]);
 
   const handleEnd = useCallback(() => {
@@ -192,6 +250,29 @@ export default function LiveChat() {
 
   return (
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
+      {/* ═══ AI Moderator Icebreaker Popup ═══ */}
+      {icebreakerTip && (
+        <div className="fixed bottom-28 right-4 lg:right-[340px] z-[150] animate-scale-in max-w-[260px]">
+          <div className="relative bg-card border border-primary/40 rounded-xl px-3.5 py-2.5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]">
+            <button
+              onClick={() => setIcebreakerTip(null)}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground text-[10px] transition-colors"
+            >
+              ✕
+            </button>
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                <Sparkles className="w-2.5 h-2.5 text-primary-foreground" />
+              </div>
+              <span className="text-[8px] font-bold uppercase tracking-widest text-primary">AI Moderator</span>
+            </div>
+            <p className="text-xs text-foreground leading-relaxed">{icebreakerTip}</p>
+            <div className="mt-2 h-[2px] w-full bg-muted/30 rounded-full overflow-hidden">
+              <div className="h-full bg-primary/50 rounded-full" style={{ animation: "shrink-bar 8s linear forwards" }} />
+            </div>
+          </div>
+        </div>
+      )}
       {/* ═══ Top Navigation Bar ═══ */}
       <nav className="flex items-center justify-between px-5 lg:px-8 py-3 shrink-0 z-50 border-b border-border/30">
         <div className="flex items-center gap-6 lg:gap-10">
