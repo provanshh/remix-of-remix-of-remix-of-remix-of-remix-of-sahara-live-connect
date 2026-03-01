@@ -12,13 +12,12 @@ const AD_DURATION = 10; // seconds
 export default function FreeMatchAdModal({ open, onClose, onAdComplete }: FreeMatchAdModalProps) {
   const [phase, setPhase] = useState<"intro" | "playing" | "complete">("intro");
   const [secondsLeft, setSecondsLeft] = useState(AD_DURATION);
-  const [canSkip, setCanSkip] = useState(false);
+
 
   useEffect(() => {
     if (!open) {
       setPhase("intro");
       setSecondsLeft(AD_DURATION);
-      setCanSkip(false);
     }
   }, [open]);
 
@@ -32,22 +31,15 @@ export default function FreeMatchAdModal({ open, onClose, onAdComplete }: FreeMa
     return () => clearTimeout(t);
   }, [phase, secondsLeft]);
 
-  // Allow skip after 5 seconds
-  useEffect(() => {
-    if (phase !== "playing") return;
-    const t = setTimeout(() => setCanSkip(true), 5000);
-    return () => clearTimeout(t);
-  }, [phase]);
-
   const handleStart = useCallback(() => {
     setPhase("playing");
   }, []);
 
-  const handleSkipOrComplete = useCallback(() => {
-    if (phase === "complete" || canSkip) {
+  const handleComplete = useCallback(() => {
+    if (phase === "complete") {
       onAdComplete();
     }
-  }, [phase, canSkip, onAdComplete]);
+  }, [phase, onAdComplete]);
 
   if (!open) return null;
 
@@ -128,19 +120,11 @@ export default function FreeMatchAdModal({ open, onClose, onAdComplete }: FreeMa
             {/* Bottom section */}
             <div className="p-5 text-center">
               <p className="text-xs text-muted-foreground mb-3">
-                {canSkip ? "You can skip now or wait for bonus!" : `Skip available in ${Math.max(0, 5 - (AD_DURATION - secondsLeft))}s...`}
+                Please watch the full ad to unlock filters
               </p>
-              <button
-                onClick={handleSkipOrComplete}
-                disabled={!canSkip}
-                className={`px-8 py-2.5 rounded-full text-sm font-semibold transition-all duration-300
-                  ${canSkip
-                    ? "bg-primary text-primary-foreground shadow-[0_0_16px_hsl(var(--primary)/0.4)] hover:brightness-110 active:scale-95"
-                    : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
-                  }`}
-              >
-                {canSkip ? "Skip Ad →" : "Please wait..."}
-              </button>
+              <div className="px-8 py-2.5 rounded-full text-sm font-semibold bg-muted text-muted-foreground opacity-50">
+                {secondsLeft}s remaining...
+              </div>
             </div>
           </div>
         )}
@@ -155,7 +139,7 @@ export default function FreeMatchAdModal({ open, onClose, onAdComplete }: FreeMa
               Advanced filters are now active for <span className="text-primary font-semibold">1 minute</span>
             </p>
             <button
-              onClick={handleSkipOrComplete}
+              onClick={handleComplete}
               className="w-full py-3.5 rounded-2xl font-display font-bold text-sm tracking-tight transition-all duration-300 active:scale-[0.97]
                 bg-gradient-to-r from-primary to-accent text-primary-foreground
                 shadow-[0_0_24px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_40px_hsl(var(--primary)/0.7)] hover:brightness-110"
