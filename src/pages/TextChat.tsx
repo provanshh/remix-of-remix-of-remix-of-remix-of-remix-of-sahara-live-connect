@@ -167,22 +167,22 @@ export default function TextChat() {
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
       {/* ═══ AI Moderator Icebreaker Popup ═══ */}
       {icebreakerTip && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[150] animate-scale-in max-w-sm w-[90%]">
-          <div className="relative bg-card border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_0_30px_hsl(var(--primary)/0.2)]">
+        <div className="fixed bottom-28 right-4 lg:right-[340px] z-[150] animate-scale-in max-w-[260px]">
+          <div className="relative bg-card border border-primary/40 rounded-xl px-3.5 py-2.5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]">
             <button
               onClick={() => setIcebreakerTip(null)}
-              className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground text-[10px] transition-colors"
             >
               ×
             </button>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-2.5 h-2.5 text-primary-foreground" />
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Moderator</span>
+              <span className="text-[8px] font-bold uppercase tracking-widest text-primary">AI Moderator</span>
             </div>
-            <p className="text-sm text-foreground leading-relaxed">{icebreakerTip}</p>
-            <div className="mt-3 h-0.5 w-full bg-muted/30 rounded-full overflow-hidden">
+            <p className="text-xs text-foreground leading-relaxed">{icebreakerTip}</p>
+            <div className="mt-2 h-[2px] w-full bg-muted/30 rounded-full overflow-hidden">
               <div className="h-full bg-primary/50 rounded-full" style={{ animation: "shrink-bar 8s linear forwards" }} />
             </div>
           </div>
