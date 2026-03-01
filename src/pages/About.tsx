@@ -4,6 +4,7 @@ import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook } from "lu
 import ThemeToggle from "@/components/ThemeToggle";
 import FloatingCardsBackground from "@/components/FloatingCardsBackground";
 import CoinShopModal from "@/components/CoinShopModal";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0);
@@ -65,8 +66,8 @@ export default function About() {
 
       {/* ═══ Top Nav ═══ */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
-        <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight hover:opacity-80 transition-opacity">
-          Sahara
+        <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity">
+          <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
         </button>
         <div className="flex items-center gap-3 md:gap-5">
           <button onClick={() => navigate("/")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">

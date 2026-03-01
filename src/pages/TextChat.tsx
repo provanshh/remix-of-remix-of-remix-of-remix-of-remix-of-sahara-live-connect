@@ -6,6 +6,7 @@ import { filterMessage } from "@/lib/profanityFilter";
 import { containsPersonalInfo } from "@/lib/privacyFilter";
 import ThemeToggle from "@/components/ThemeToggle";
 import AvatarSelector, { AVATAR_OPTIONS, type AvatarOption } from "@/components/AvatarSelector";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 type ChatMessage = { text: string; sender: "me" | "them" | "system" };
 type ConnectionState = "idle" | "searching" | "connected";
@@ -277,7 +278,7 @@ export default function TextChat() {
       {/* ═══ Top Nav ═══ */}
       <nav className="flex items-center justify-between px-5 lg:px-8 py-3 shrink-0 z-50 border-b border-border/30">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold sahara-shine tracking-tight">Sahara</button>
+          <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity"><img src={saharaLogo} alt="Sahara" className="h-9 w-auto" /></button>
           <div className="hidden sm:flex items-center gap-6">
             <button onClick={() => navigate("/live")} className="nav-link-hover text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider pb-0.5">Video Chat</button>
             <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5 uppercase tracking-wider">Message</span>

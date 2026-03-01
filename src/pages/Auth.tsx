@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import saharaLogo from "@/assets/sahara-logo.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -55,8 +56,8 @@ export default function Auth() {
           <button onClick={() => navigate("/")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
-            Sahara
+          <button onClick={() => navigate("/")} className="hover:opacity-80 transition-opacity">
+            <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
           </button>
         </div>
         <ThemeToggle />
