@@ -23,8 +23,9 @@ interface Props {
   onSelect: (avatar: AvatarOption) => void;
 }
 
-// Floating particle for the animated background
-function Particle({ delay, size, x, duration }: { delay: number; size: number; x: number; duration: number }) {
+// Fire ember particle
+function Ember({ delay, size, x, duration, color }: { delay: number; size: number; x: number; duration: number; color: string }) {
+  const drift = (Math.random() - 0.5) * 40;
   return (
     <div
       className="absolute rounded-full pointer-events-none"
@@ -32,9 +33,11 @@ function Particle({ delay, size, x, duration }: { delay: number; size: number; x
         width: size,
         height: size,
         left: `${x}%`,
-        bottom: -size,
-        background: `radial-gradient(circle, hsl(var(--primary) / 0.4), transparent)`,
-        animation: `float-particle ${duration}s ${delay}s linear infinite`,
+        bottom: -size * 2,
+        background: `radial-gradient(circle, ${color}, transparent)`,
+        boxShadow: `0 0 ${size * 2}px ${color}`,
+        animation: `ember-rise ${duration}s ${delay}s ease-out infinite`,
+        ["--drift" as string]: `${drift}px`,
       }}
     />
   );
@@ -45,7 +48,7 @@ export default function AvatarSelector({ onSelect }: Props) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Animated grid background
+  // Animated fire/lava background
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -53,7 +56,6 @@ export default function AvatarSelector({ onSelect }: Props) {
     if (!ctx) return;
 
     let animFrame: number;
-    let offset = 0;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -62,42 +64,64 @@ export default function AvatarSelector({ onSelect }: Props) {
     resize();
     window.addEventListener("resize", resize);
 
+    const fireParticles: { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number; hue: number }[] = [];
+
+    const spawnParticle = () => {
+      fireParticles.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height + 10,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: -(1.5 + Math.random() * 3),
+        life: 0,
+        maxLife: 80 + Math.random() * 120,
+        size: 3 + Math.random() * 6,
+        hue: 10 + Math.random() * 30, // orange to red
+      });
+    };
+
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const spacing = 60;
-      const speed = 0.3;
-      offset = (offset + speed) % spacing;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeStyle = "hsla(180, 80%, 50%, 0.04)";
-      ctx.lineWidth = 1;
+      // Spawn new particles
+      for (let i = 0; i < 3; i++) spawnParticle();
 
-      // Vertical lines
-      for (let x = offset; x < canvas.width; x += spacing) {
+      // Update & draw
+      for (let i = fireParticles.length - 1; i >= 0; i--) {
+        const p = fireParticles[i];
+        p.x += p.vx + Math.sin(p.life * 0.05) * 0.5;
+        p.y += p.vy;
+        p.vy *= 0.995;
+        p.life++;
+
+        const progress = p.life / p.maxLife;
+        const alpha = progress < 0.1 ? progress * 10 : Math.max(0, 1 - progress);
+        const size = p.size * (1 - progress * 0.5);
+
+        // Shift hue from yellow-orange to deep red as it rises
+        const hue = p.hue - progress * 15;
+        const lightness = 55 - progress * 30;
+
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2);
+        gradient.addColorStop(0, `hsla(${hue}, 100%, ${lightness}%, ${alpha * 0.6})`);
+        gradient.addColorStop(0.5, `hsla(${hue - 10}, 90%, ${lightness - 15}%, ${alpha * 0.3})`);
+        gradient.addColorStop(1, `hsla(${hue - 20}, 80%, ${lightness - 25}%, 0)`);
+
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-      // Horizontal lines
-      for (let y = offset; y < canvas.height; y += spacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
+        ctx.arc(p.x, p.y, size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        if (p.life >= p.maxLife) fireParticles.splice(i, 1);
       }
 
-      // Pulsing glow dots at intersections
-      const time = Date.now() * 0.001;
-      ctx.fillStyle = "hsla(180, 80%, 50%, 0.08)";
-      for (let x = offset; x < canvas.width; x += spacing * 3) {
-        for (let y = offset; y < canvas.height; y += spacing * 3) {
-          const pulse = Math.sin(time + x * 0.01 + y * 0.01) * 0.5 + 0.5;
-          const r = 2 + pulse * 2;
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+      // Bottom fire glow
+      const bottomGlow = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - 200);
+      bottomGlow.addColorStop(0, "hsla(15, 100%, 50%, 0.08)");
+      bottomGlow.addColorStop(0.5, "hsla(25, 90%, 40%, 0.03)");
+      bottomGlow.addColorStop(1, "transparent");
+      ctx.fillStyle = bottomGlow;
+      ctx.fillRect(0, canvas.height - 200, canvas.width, 200);
 
       animFrame = requestAnimationFrame(draw);
     };
@@ -109,11 +133,13 @@ export default function AvatarSelector({ onSelect }: Props) {
     };
   }, []);
 
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    delay: Math.random() * 8,
-    size: 4 + Math.random() * 8,
+  // CSS ember particles
+  const embers = Array.from({ length: 30 }, (_, i) => ({
+    delay: Math.random() * 6,
+    size: 3 + Math.random() * 6,
     x: Math.random() * 100,
-    duration: 6 + Math.random() * 8,
+    duration: 4 + Math.random() * 6,
+    color: [`hsla(20,100%,55%,0.7)`, `hsla(35,100%,60%,0.6)`, `hsla(10,100%,45%,0.5)`, `hsla(45,100%,65%,0.5)`][Math.floor(Math.random() * 4)],
   }));
 
   return (
@@ -121,16 +147,16 @@ export default function AvatarSelector({ onSelect }: Props) {
       {/* Animated grid canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
 
-      {/* Floating particles */}
-      {particles.map((p, i) => (
-        <Particle key={i} {...p} />
+      {/* Fire embers */}
+      {embers.map((p, i) => (
+        <Ember key={i} {...p} />
       ))}
 
-      {/* Radial glows */}
+      {/* Fiery radial glows */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[150px]" />
-        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 w-[400px] h-[400px] rounded-full bg-violet-500/5 blur-[120px]" />
-        <div className="absolute bottom-1/3 left-0 -translate-x-1/4 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-[700px] h-[400px] rounded-full blur-[150px]" style={{ background: "hsla(20, 100%, 45%, 0.12)" }} />
+        <div className="absolute bottom-0 right-1/4 translate-y-1/3 w-[400px] h-[300px] rounded-full blur-[120px]" style={{ background: "hsla(35, 100%, 50%, 0.08)" }} />
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] rounded-full blur-[100px]" style={{ background: "hsla(10, 90%, 40%, 0.06)" }} />
       </div>
 
       {/* Content */}
