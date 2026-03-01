@@ -28,34 +28,38 @@ function FloatingOrbs() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Floating orbs
-    const orbs = Array.from({ length: 6 }, () => ({
+    // Floating orbs — bigger, brighter, more of them
+    const orbs = Array.from({ length: 10 }, () => ({
       x: Math.random() * canvas.offsetWidth,
       y: Math.random() * canvas.offsetHeight,
-      r: 80 + Math.random() * 200,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      hue: 170 + Math.random() * 30,
-      alpha: 0.04 + Math.random() * 0.06,
+      r: 120 + Math.random() * 300,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      hue: 165 + Math.random() * 35,
+      alpha: 0.08 + Math.random() * 0.12,
+      pulseSpeed: 0.005 + Math.random() * 0.01,
+      pulsePhase: Math.random() * Math.PI * 2,
     }));
 
-    // Particles
-    const particles = Array.from({ length: 50 }, () => ({
+    // Particles — more, brighter
+    const particles = Array.from({ length: 90 }, () => ({
       x: Math.random() * canvas.offsetWidth,
       y: Math.random() * canvas.offsetHeight,
-      r: 1 + Math.random() * 2,
-      speed: 0.2 + Math.random() * 0.4,
-      alpha: 0.2 + Math.random() * 0.5,
+      r: 1.5 + Math.random() * 3,
+      speed: 0.3 + Math.random() * 0.6,
+      alpha: 0.4 + Math.random() * 0.6,
       pulse: Math.random() * Math.PI * 2,
     }));
 
     const w = () => canvas.offsetWidth;
     const h = () => canvas.offsetHeight;
 
+    let time = 0;
     const draw = () => {
       ctx.clearRect(0, 0, w(), h());
+      time += 1;
 
-      // Draw orbs
+      // Draw orbs with pulsing
       orbs.forEach((o) => {
         o.x += o.vx;
         o.y += o.vy;
@@ -64,27 +68,38 @@ function FloatingOrbs() {
         if (o.y < -o.r) o.y = h() + o.r;
         if (o.y > h() + o.r) o.y = -o.r;
 
-        const grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-        grad.addColorStop(0, `hsla(${o.hue}, 80%, 50%, ${o.alpha})`);
-        grad.addColorStop(1, `hsla(${o.hue}, 80%, 50%, 0)`);
+        const pulse = 0.7 + 0.3 * Math.sin(time * o.pulseSpeed + o.pulsePhase);
+        const currentAlpha = o.alpha * pulse;
+        const currentR = o.r * (0.9 + 0.1 * pulse);
+
+        const grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, currentR);
+        grad.addColorStop(0, `hsla(${o.hue}, 85%, 55%, ${currentAlpha})`);
+        grad.addColorStop(0.4, `hsla(${o.hue}, 80%, 45%, ${currentAlpha * 0.5})`);
+        grad.addColorStop(1, `hsla(${o.hue}, 80%, 40%, 0)`);
         ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+        ctx.arc(o.x, o.y, currentR, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
       });
 
-      // Draw particles
+      // Draw particles with glow
       particles.forEach((p) => {
         p.y -= p.speed;
-        p.pulse += 0.02;
+        p.pulse += 0.03;
         if (p.y < -10) {
           p.y = h() + 10;
           p.x = Math.random() * w();
         }
-        const a = p.alpha * (0.5 + 0.5 * Math.sin(p.pulse));
+        const a = p.alpha * (0.4 + 0.6 * Math.sin(p.pulse));
+        // Glow layer
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(180, 80%, 60%, ${a * 0.15})`;
+        ctx.fill();
+        // Core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(180, 80%, 60%, ${a})`;
+        ctx.fillStyle = `hsla(180, 90%, 70%, ${a})`;
         ctx.fill();
       });
 
@@ -102,7 +117,7 @@ function FloatingOrbs() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.7 }}
+      style={{ opacity: 1 }}
     />
   );
 }
