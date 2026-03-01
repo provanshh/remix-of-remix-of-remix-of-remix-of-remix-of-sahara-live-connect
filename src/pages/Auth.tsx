@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -51,9 +51,14 @@ export default function Auth() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <nav className="flex items-center justify-between px-6 lg:px-10 py-5">
-        <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
-          Sahara
-        </button>
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate("/")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold text-primary glow-text tracking-tight">
+            Sahara
+          </button>
+        </div>
         <ThemeToggle />
       </nav>
 
