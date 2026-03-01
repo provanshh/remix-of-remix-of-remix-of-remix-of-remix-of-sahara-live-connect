@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal, Sparkles, AlertTriangle, Flag, Ban, ShieldAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -72,6 +72,7 @@ export default function LiveChat() {
   const [coinBalance] = useState(100); // from wallet
   const [storeShopOpen, setStoreShopOpen] = useState(false);
   const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
+  const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const lastMessageTimeRef = useRef<number>(0);
   const icebreakerIndexRef = useRef(0);
 
@@ -346,6 +347,41 @@ export default function LiveChat() {
               connectionState === "connected" && remoteVisible ? "opacity-100" : "opacity-0"
             }`}
           />
+
+          {/* ═══ Report / Caution Button ═══ */}
+          {connectionState === "connected" && (
+            <div className="absolute top-3 right-3 z-30">
+              <button
+                onClick={() => setReportMenuOpen((v) => !v)}
+                className="w-9 h-9 rounded-lg bg-destructive/20 backdrop-blur-sm border border-destructive/30 flex items-center justify-center hover:bg-destructive/40 transition-colors"
+                title="Report user"
+              >
+                <AlertTriangle className="w-4 h-4 text-destructive" />
+              </button>
+              {reportMenuOpen && (
+                <div className="absolute top-11 right-0 w-48 rounded-xl bg-card border border-border shadow-xl p-2 space-y-1 animate-scale-in">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 py-1">Report User</p>
+                  {[
+                    { icon: Ban, label: "Inappropriate behavior" },
+                    { icon: ShieldAlert, label: "Harassment" },
+                    { icon: Flag, label: "Spam / Ads" },
+                  ].map(({ icon: Icon, label }) => (
+                    <button
+                      key={label}
+                      onClick={() => {
+                        setReportMenuOpen(false);
+                        setMessages((m) => [...m, { text: `Report submitted: ${label}. Thank you.`, sender: "system" }]);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left"
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Match Reveal Overlay */}
           <MatchRevealOverlay
