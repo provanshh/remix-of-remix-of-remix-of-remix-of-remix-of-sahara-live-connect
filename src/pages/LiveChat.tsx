@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, Sparkles, Smile, Maximize2, ChevronDown, X } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -44,6 +44,7 @@ export default function LiveChat() {
   const [country, setCountry] = useState<Country>(COUNTRIES[COUNTRIES.length - 1]);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [onlineCount] = useState(() => Math.floor(Math.random() * 15000) + 20000);
 
   const [matchCountry, setMatchCountry] = useState<Country>(COUNTRIES[0]);
   const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
@@ -169,73 +170,73 @@ export default function LiveChat() {
     setMicOn((v) => !v);
   }, []);
 
-  const matchName = matchGender === "girl" ? "Stranger" : "Stranger";
-
   return (
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
       {/* ═══ Top Navigation Bar ═══ */}
       <nav className="flex items-center justify-between px-5 lg:px-8 py-3 shrink-0 z-50 border-b border-border/30">
-        <div className="flex items-center gap-6 lg:gap-8">
-          <button onClick={() => navigate("/")} className="text-xl font-display font-bold text-primary glow-text tracking-tight">
+        <div className="flex items-center gap-6 lg:gap-10">
+          <button onClick={() => navigate("/")} className="text-2xl font-display font-bold sahara-shine tracking-tight">
             Sahara
           </button>
-          <div className="hidden sm:flex items-center gap-5">
-            <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5">Video Chat</span>
-            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Messages</button>
-            <button onClick={() => navigate("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">About</button>
+          <div className="hidden sm:flex items-center gap-6">
+            <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5 uppercase tracking-wider">Video Chat</span>
+            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Message</button>
+            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">History</button>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
-            💎 Shop
+          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
+            FreeMatch
           </button>
-          <button onClick={() => navigate("/history")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border text-sm font-medium text-foreground hover:bg-muted/50 transition-colors">
-            🕐 History
+          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
+            Store
           </button>
-
-          {/* Country selector */}
-          <div className="relative" ref={countryDropdownRef}>
-            <button
-              onClick={() => setCountryDropdownOpen((o) => !o)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-sm hover:bg-muted/50 transition-colors"
-            >
-              <span>{country.flag}</span>
-              <ChevronDown className="w-3 h-3 text-muted-foreground" />
-            </button>
-            {countryDropdownOpen && (
-              <div className="absolute top-full mt-1 right-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
-                {COUNTRIES.map((c) => (
-                  <button
-                    key={c.code}
-                    onClick={() => { setCountry(c); setCountryDropdownOpen(false); }}
-                    className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${
-                      c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"
-                    }`}
-                  >
-                    <span className="text-base leading-none">{c.flag}</span>
-                    <span className="font-medium text-xs">{c.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Gender toggle */}
-          <button
-            onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-sm hover:bg-muted/50 transition-colors"
-          >
-            <span>{gender === "boy" ? "👦" : "👧"}</span>
+          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
+            <Crown className="w-3.5 h-3.5" /> PLUS
           </button>
-
           <ThemeToggle />
         </div>
       </nav>
 
-      {/* ═══ Video Panels ═══ */}
-      <div className="flex-1 flex gap-3 p-3 min-h-0">
-        {/* LEFT — Stranger */}
-        <div className="flex-1 relative rounded-2xl overflow-hidden bg-card border border-border/20">
+      {/* ═══ Main Content: Videos + Sidebar ═══ */}
+      <div className="flex-1 flex min-h-0 p-3 gap-3">
+        {/* LEFT — Local Camera (You) */}
+        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-black border border-border/20">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+            style={{ transform: "scaleX(-1)" }}
+          />
+          {!cameraOn && (
+            <div className="absolute inset-0 bg-black flex items-center justify-center">
+              <VideoOff className="w-16 h-16 text-muted-foreground/40" />
+            </div>
+          )}
+
+          {/* Camera/Mic controls overlay */}
+          <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+            <button onClick={toggleCamera} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={cameraOn ? "Turn off camera" : "Turn on camera"}>
+              {cameraOn ? <Video className="w-4 h-4 text-foreground" /> : <VideoOff className="w-4 h-4 text-destructive" />}
+            </button>
+            <button onClick={toggleMic} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={micOn ? "Mute" : "Unmute"}>
+              {micOn ? <Mic className="w-4 h-4 text-foreground" /> : <MicOff className="w-4 h-4 text-destructive" />}
+            </button>
+          </div>
+
+          {/* You label */}
+          <div className="absolute bottom-4 left-4 z-20">
+            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              You
+            </div>
+          </div>
+        </div>
+
+        {/* CENTER — Stranger */}
+        <div className="flex-[1.1] relative rounded-2xl overflow-hidden bg-card border border-border/20">
           <video
             ref={remoteVideoRef}
             autoPlay
@@ -245,7 +246,7 @@ export default function LiveChat() {
             }`}
           />
 
-          {/* Match Reveal Overlay — inside stranger panel */}
+          {/* Match Reveal Overlay */}
           <MatchRevealOverlay
             visible={connectionState === "revealing"}
             country={matchCountry}
@@ -253,22 +254,21 @@ export default function LiveChat() {
             onRevealComplete={handleRevealComplete}
           />
 
-          {/* Searching state */}
+          {/* Searching state — with online count */}
           {connectionState === "searching" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <div className="relative mb-5">
-                <div className="w-14 h-14 rounded-full border border-primary/30 animate-pulse absolute -inset-1" />
-                <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
-                  <Video className="w-5 h-5 text-primary-foreground" />
-                </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-card">
+              <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4">
+                <Video className="w-7 h-7 text-primary-foreground" />
               </div>
-              <p className="text-muted-foreground font-display font-medium text-sm tracking-tight">
+              <p className="text-3xl font-display font-bold text-primary mb-1">{onlineCount.toLocaleString()}</p>
+              <p className="text-muted-foreground text-sm">+ Online</p>
+              <p className="text-muted-foreground/60 text-xs mt-4">
                 Searching{searchDots}
               </p>
             </div>
           )}
 
-          {/* Waiting for video */}
+          {/* Connected but no video */}
           {connectionState === "connected" && !remoteVideoRef.current?.srcObject && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <VideoOff className="w-12 h-12 text-muted-foreground/30 mb-2" />
@@ -276,29 +276,13 @@ export default function LiveChat() {
             </div>
           )}
 
-          {/* Side action icons */}
-          <div className="absolute top-4 left-4 z-20 flex flex-col gap-3">
-            <button onClick={toggleCamera} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={cameraOn ? "Turn off camera" : "Turn on camera"}>
-              {cameraOn ? <Video className="w-4 h-4 text-foreground" /> : <VideoOff className="w-4 h-4 text-destructive" />}
-            </button>
-            <button onClick={toggleMic} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={micOn ? "Mute" : "Unmute"}>
-              {micOn ? <Mic className="w-4 h-4 text-foreground" /> : <MicOff className="w-4 h-4 text-destructive" />}
-            </button>
-          </div>
-
-          {/* Stranger info badge — bottom right */}
+          {/* Stranger info badge */}
           {connectionState === "connected" && (
             <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
               <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-primary/30 flex items-center justify-center text-xs font-bold text-primary">
-                  {matchCountry.flag}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-foreground leading-tight">{matchName}</span>
-                  <span className="text-[10px] text-muted-foreground leading-tight flex items-center gap-1">
-                    {matchCountry.flag} {matchCountry.name}
-                  </span>
-                </div>
+                <span className="text-sm">{matchCountry.flag}</span>
+                <span className="text-xs font-semibold text-foreground">Stranger</span>
+                <span className="text-[10px] text-muted-foreground">{matchCountry.name}</span>
               </div>
               <button
                 onClick={() => setChatOpen((o) => !o)}
@@ -310,38 +294,74 @@ export default function LiveChat() {
           )}
         </div>
 
-        {/* RIGHT — You */}
-        <div className="flex-1 relative rounded-2xl overflow-hidden bg-card border border-border/20">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover"
-            style={{ transform: "scaleX(-1)" }}
-          />
-          {!cameraOn && (
-            <div className="absolute inset-0 bg-card flex items-center justify-center">
-              <VideoOff className="w-12 h-12 text-muted-foreground/30" />
+        {/* RIGHT — Sidebar */}
+        <div className="hidden lg:flex w-72 shrink-0 flex-col rounded-2xl border border-border/20 bg-card p-5 gap-4">
+          <p className="text-foreground text-sm leading-relaxed">
+            Ready to chat with new friends worldwide? Start matching for an enjoyable and fun communication experience! 🌍 💬
+          </p>
+          <button
+            onClick={handleNext}
+            className="w-fit px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 active:scale-95 transition-all"
+          >
+            New Chat
+          </button>
+
+          {/* Quick chat panel in sidebar */}
+          {chatEnabled && (
+            <div className="flex-1 flex flex-col mt-2 border-t border-border/30 pt-3 min-h-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live Chat</span>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar space-y-1.5 pr-1">
+                {messages.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground/30 text-center mt-8 italic">No messages yet</p>
+                )}
+                {messages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
+                  >
+                    {msg.sender === "system" ? (
+                      <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
+                    ) : (
+                      <span
+                        className={`text-xs px-3 py-1.5 rounded-2xl max-w-[85%] break-words ${
+                          msg.sender === "me"
+                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                            : "bg-muted/60 text-foreground rounded-bl-sm"
+                        }`}
+                      >
+                        {msg.text}
+                      </span>
+                    )}
+                  </div>
+                ))}
+                <div ref={chatEndRef} />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  value={input}
+                  onChange={(e) => chatEnabled && setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  placeholder="Type a message…"
+                  className="flex-1 rounded-full px-3 py-1.5 text-xs bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
+                />
+                <button
+                  onClick={handleSend}
+                  className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 hover:brightness-110 transition-all"
+                >
+                  <Send className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           )}
-
-          {/* You label */}
-          <div className="absolute bottom-4 left-4 z-20">
-            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              You
-              {!cameraOn && <VideoOff className="w-3 h-3" />}
-              {!micOn && <MicOff className="w-3 h-3" />}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* ═══ Chat Overlay (slide-up panel) ═══ */}
+      {/* ═══ Chat Overlay for mobile ═══ */}
       {chatOpen && (
-        <div className="absolute bottom-16 right-4 z-50 w-80 h-96 rounded-2xl glass-strong shadow-2xl flex flex-col overflow-hidden border border-primary/20 animate-fade-in">
-          {/* Chat header */}
+        <div className="lg:hidden absolute bottom-20 right-4 z-50 w-80 h-96 rounded-2xl glass-strong shadow-2xl flex flex-col overflow-hidden border border-primary/20 animate-fade-in">
           <div className="px-4 py-2.5 border-b border-border/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -351,8 +371,6 @@ export default function LiveChat() {
               <X className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Messages */}
           <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-4 py-2 space-y-1.5">
             {messages.length === 0 && (
               <p className="text-[11px] text-muted-foreground/30 text-center mt-12 italic">No messages yet</p>
@@ -379,8 +397,6 @@ export default function LiveChat() {
             ))}
             <div ref={chatEndRef} />
           </div>
-
-          {/* Input */}
           <div className="px-3 py-2.5 border-t border-border/30 flex items-center gap-2 shrink-0">
             <input
               value={input}
@@ -388,12 +404,12 @@ export default function LiveChat() {
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={!chatEnabled}
               placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
-              className="flex-1 rounded-full px-4 py-2 text-sm bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 rounded-full px-4 py-2 text-sm bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-40"
             />
             <button
               onClick={handleSend}
               disabled={!chatEnabled}
-              className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 hover:brightness-110 transition-all disabled:opacity-40"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
@@ -401,32 +417,49 @@ export default function LiveChat() {
         </div>
       )}
 
-      {/* ═══ Bottom Action Bar ═══ */}
-      <div className="shrink-0 flex items-center justify-between px-5 lg:px-8 py-3 border-t border-border/30">
+      {/* ═══ Bottom Action Bar — 3 buttons like reference ═══ */}
+      <div className="shrink-0 flex items-center gap-3 px-3 lg:px-5 py-3 border-t border-border/30">
+        {/* Gender toggle */}
         <button
-          onClick={handleEnd}
-          className="flex items-center gap-3 group"
+          onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
         >
-          <span className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-xs font-mono text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
-            esc
-          </span>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-foreground">End Video Chat</p>
-            <p className="text-[11px] text-muted-foreground">Press esc key to end video chat</p>
-          </div>
+          {gender === "boy" ? "👦 Male" : "👧 Female"} & {gender === "boy" ? "👧 Female" : "👦 Male"}
         </button>
 
+        {/* Country / Preferences */}
+        <div className="relative flex-1" ref={countryDropdownRef}>
+          <button
+            onClick={() => setCountryDropdownOpen((o) => !o)}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
+          >
+            <Filter className="w-4 h-4" />
+            Preferences {country.flag}
+          </button>
+          {countryDropdownOpen && (
+            <div className="absolute bottom-full mb-2 left-0 w-full max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
+              {COUNTRIES.map((c) => (
+                <button
+                  key={c.code}
+                  onClick={() => { setCountry(c); setCountryDropdownOpen(false); }}
+                  className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${
+                    c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"
+                  }`}
+                >
+                  <span className="text-base leading-none">{c.flag}</span>
+                  <span className="font-medium text-xs">{c.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Start Match / Next */}
         <button
           onClick={handleNext}
-          className="flex items-center gap-3 group"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
         >
-          <div className="text-right">
-            <p className="text-sm font-semibold text-foreground">Next Video Chat</p>
-            <p className="text-[11px] text-muted-foreground">Press right key to meet others</p>
-          </div>
-          <span className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
-            <ArrowRight className="w-5 h-5" />
-          </span>
+          Start Match <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>
