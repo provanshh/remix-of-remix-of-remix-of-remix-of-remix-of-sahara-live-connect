@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Flame, Gamepad2, Headphones, BookOpen, Moon, Rainbow, Zap } from "lucide-react";
+import { Flame, Gamepad2, Headphones, BookOpen, Moon, Rainbow, Zap, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export type AvatarOption = {
   id: string;
@@ -44,6 +45,7 @@ function Ember({ delay, size, x, duration, color }: { delay: number; size: numbe
 }
 
 export default function AvatarSelector({ onSelect }: Props) {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -161,6 +163,15 @@ export default function AvatarSelector({ onSelect }: Props) {
 
       {/* Content */}
       <div className="relative z-10 max-w-xl w-full text-center">
+        {/* Back button */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute -top-2 left-0 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          Back
+        </button>
+
         {/* Title with gaming flair */}
         <div className="flex items-center justify-center gap-2 mb-1">
           <Zap className="w-5 h-5 text-primary animate-pulse" />
