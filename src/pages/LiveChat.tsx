@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
 import MatchRevealOverlay from "@/components/MatchRevealOverlay";
+import FilterBottomSheet from "@/components/FilterBottomSheet";
+import UnlockFiltersModal from "@/components/UnlockFiltersModal";
 
 const COUNTRIES = [
   { code: "US", name: "USA", flag: "🇺🇸" },
@@ -50,6 +52,10 @@ export default function LiveChat() {
   const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [idle, setIdle] = useState(true);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [unlockModalOpen, setUnlockModalOpen] = useState(false);
+  const [filtersUnlocked, setFiltersUnlocked] = useState(false);
+  const [coinBalance] = useState(100); // from wallet
 
   const chatEnabled = connectionState === "connected";
 
@@ -484,6 +490,18 @@ export default function LiveChat() {
           )}
         </button>
 
+        {/* Filter button — between Start/Next and End */}
+        <button
+          onClick={() => setFilterSheetOpen(true)}
+          className="flex-1 max-w-[120px] flex items-center justify-center gap-2 py-3.5 rounded-xl bg-secondary text-secondary-foreground font-display font-bold text-sm tracking-tight
+            border border-border/30 hover:border-primary/40 hover:bg-secondary/80
+            shadow-[0_2px_12px_hsl(var(--secondary)/0.2)] hover:shadow-[0_4px_20px_hsl(var(--primary)/0.15)]
+            active:scale-[0.96] transition-all duration-200"
+        >
+          <SlidersHorizontal className="w-4 h-4 text-primary" />
+          Filter
+        </button>
+
         {/* End button — return to landing page */}
         <button
           onClick={handleEnd}
@@ -494,6 +512,22 @@ export default function LiveChat() {
           End
         </button>
       </div>
+
+      {/* Filter Bottom Sheet */}
+      <FilterBottomSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        onUnlockRequest={() => { setFilterSheetOpen(false); setUnlockModalOpen(true); }}
+        unlocked={filtersUnlocked}
+      />
+
+      {/* Unlock Filters Modal */}
+      <UnlockFiltersModal
+        open={unlockModalOpen}
+        onClose={() => setUnlockModalOpen(false)}
+        coinBalance={coinBalance}
+        onUnlock={() => { setFiltersUnlocked(true); setUnlockModalOpen(false); setFilterSheetOpen(true); }}
+      />
     </div>
   );
 }
