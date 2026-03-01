@@ -79,13 +79,13 @@ export default function LandingPage() {
 
         {/* Nav links - centered between logo and right section */}
         <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
-          <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-foreground hover:text-primary transition-colors pb-0.5">
+          <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-white hover:text-primary transition-colors pb-0.5">
             Video Chat
           </button>
-          <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+          <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-white hover:text-primary transition-colors pb-0.5">
             Messages
           </button>
-          <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+          <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-white hover:text-primary transition-colors pb-0.5">
             About
           </button>
         </div>
@@ -149,7 +149,7 @@ export default function LandingPage() {
         {/* ─── Left Panel: Brand + CTA ─── */}
         <div className="lg:w-[48%] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0 relative">
           {/* Large brand name */}
-          <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-bold tracking-tighter select-none leading-none mb-8 sahara-shine cursor-default">
+          <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter select-none leading-none mb-8 sahara-shine cursor-default italic">
             sahara
           </h1>
 
