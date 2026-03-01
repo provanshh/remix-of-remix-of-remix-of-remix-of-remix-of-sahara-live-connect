@@ -217,9 +217,9 @@ export default function TextChat() {
         <div className="flex items-center gap-6">
           <button onClick={() => navigate("/")} className="text-2xl font-display font-bold sahara-shine tracking-tight">Sahara</button>
           <div className="hidden sm:flex items-center gap-6">
-            <button onClick={() => navigate("/live")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Video Chat</button>
+            <button onClick={() => navigate("/live")} className="nav-link-hover text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider pb-0.5">Video Chat</button>
             <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5 uppercase tracking-wider">Message</span>
-            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">History</button>
+            <button onClick={() => navigate("/history")} className="nav-link-hover text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider pb-0.5">History</button>
           </div>
         </div>
         <div className="flex items-center gap-3">

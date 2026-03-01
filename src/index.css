@@ -112,6 +112,18 @@
 }
 
 @layer utilities {
+  .nav-link-hover {
+    @apply relative;
+  }
+  .nav-link-hover::after {
+    content: '';
+    @apply absolute left-0 bottom-0 w-full h-[2px] rounded-full scale-x-0 origin-right transition-transform duration-300;
+    background: hsl(var(--primary));
+  }
+  .nav-link-hover:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+
   .glass {
     background: hsl(var(--glass-bg) / 0.6);
     backdrop-filter: blur(20px);
