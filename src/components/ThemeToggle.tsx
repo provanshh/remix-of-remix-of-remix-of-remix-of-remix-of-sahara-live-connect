@@ -20,7 +20,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setDark((d) => !d)}
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
-      className="w-9 h-9 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
+      className="w-9 h-9 rounded-full glass flex items-center justify-center text-white hover:text-primary transition-all duration-300 hover:scale-110"
     >
       {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </button>
