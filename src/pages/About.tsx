@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Smartphone, Facebook } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
-import ParticleBackground from "@/components/ParticleBackground";
+import FloatingCardsBackground from "@/components/FloatingCardsBackground";
 
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0);
@@ -59,7 +59,7 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <ParticleBackground />
+      <FloatingCardsBackground />
 
       {/* ═══ Top Nav ═══ */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
