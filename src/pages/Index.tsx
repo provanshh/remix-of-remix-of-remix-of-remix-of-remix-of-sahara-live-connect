@@ -73,35 +73,35 @@ export default function LandingPage() {
 
       {/* ═══ Top Nav ═══ */}
       <nav className="relative z-20 flex items-center justify-between px-6 lg:px-10 py-5">
-        <span className="flex items-center">
-          <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
-        </span>
-        <div className="flex items-center gap-3 md:gap-5">
-          {/* Nav links */}
-          <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-foreground hover:text-primary transition-colors hidden md:block pb-0.5">
-            Video Chat
-          </button>
-          <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors hidden md:block pb-0.5">
-            Messages
-          </button>
-          <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors hidden md:block pb-0.5">
-            About
-          </button>
-
-          {/* Divider */}
-          <div className="hidden md:block w-px h-5 bg-border/30" />
-
-          {/* Shop */}
-          <button onClick={() => setShopOpen(true)} className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
-            <ShoppingBag className="w-4 h-4 text-amber-400" />
-            Shop
-          </button>
-
-          {/* History */}
-          <button onClick={() => navigate("/history")} className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
-            <Clock className="w-4 h-4" />
-            History
-          </button>
+        <div className="flex items-center gap-8">
+          <span className="flex items-center">
+            <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
+          </span>
+          {/* Nav links - grouped with logo */}
+          <div className="hidden md:flex items-center gap-6">
+            <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-foreground hover:text-primary transition-colors pb-0.5">
+              Video Chat
+            </button>
+            <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+              Messages
+            </button>
+            <button onClick={() => navigate("/about")} className="nav-link-hover text-base font-medium text-foreground hover:text-primary transition-colors pb-0.5">
+              About
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 md:gap-4">
+          {/* Shop & History */}
+          <div className="hidden md:flex items-center gap-2">
+            <button onClick={() => setShopOpen(true)} className="flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
+              <ShoppingBag className="w-4 h-4 text-amber-400" />
+              Shop
+            </button>
+            <button onClick={() => navigate("/history")} className="flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
+              <Clock className="w-4 h-4" />
+              History
+            </button>
+          </div>
 
           {/* Divider */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
