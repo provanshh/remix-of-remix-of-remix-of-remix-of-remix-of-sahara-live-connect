@@ -155,6 +155,14 @@ export default function LiveChat() {
     simulateMatch();
   }, [idle, clearRemote, simulateMatch, startLocalCamera]);
 
+  const handleStop = useCallback(() => {
+    clearRemote();
+    stopLocalCamera();
+    setHasStarted(false);
+    setIdle(true);
+    setMessages([]);
+  }, [clearRemote, stopLocalCamera]);
+
   const handleEnd = useCallback(() => {
     clearRemote();
     stopLocalCamera();
@@ -474,7 +482,7 @@ export default function LiveChat() {
         {/* Dynamic Start Match / Next button */}
         <button
           onClick={handleStartMatch}
-          className={`flex-[2] flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-display font-bold text-base tracking-tight
+          className={`flex-[1.2] flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-display font-bold text-base tracking-tight
             active:scale-[0.96] transition-all duration-300 relative overflow-hidden
             ${!hasStarted
               ? "bg-primary text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.5),0_0_60px_hsl(var(--primary)/0.2)] hover:shadow-[0_0_32px_hsl(var(--primary)/0.7),0_0_80px_hsl(var(--primary)/0.3)] hover:brightness-110 animate-glow-pulse"
@@ -494,7 +502,18 @@ export default function LiveChat() {
           )}
         </button>
 
-        {/* Filter button — between Start/Next and End */}
+        {/* Stop button — stops matching but stays on page */}
+        <button
+          onClick={handleStop}
+          className="flex-1 max-w-[120px] flex items-center justify-center gap-2 py-3.5 rounded-xl bg-muted text-foreground font-display font-bold text-sm tracking-tight
+            border border-border/30 hover:border-muted-foreground/40 hover:bg-muted/80
+            shadow-sm hover:shadow-md hover:brightness-110
+            active:scale-[0.96] transition-all duration-200"
+        >
+          Stop
+        </button>
+
+        {/* Filter button */}
         <button
           onClick={() => setFilterSheetOpen(true)}
           className="flex-1 max-w-[120px] flex items-center justify-center gap-2 py-3.5 rounded-xl bg-secondary text-secondary-foreground font-display font-bold text-sm tracking-tight
