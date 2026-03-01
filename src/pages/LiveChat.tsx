@@ -370,7 +370,9 @@ export default function LiveChat() {
                       key={label}
                       onClick={() => {
                         setReportMenuOpen(false);
-                        setMessages((m) => [...m, { text: `Report submitted: ${label}. Thank you.`, sender: "system" }]);
+                        clearRemote();
+                        setMessages([{ text: `Report submitted: ${label}. Finding next stranger…`, sender: "system" }]);
+                        setTimeout(() => simulateMatch(), 1500);
                       }}
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left"
                     >
