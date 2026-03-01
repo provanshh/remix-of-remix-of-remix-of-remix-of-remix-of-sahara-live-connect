@@ -14,13 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_history: {
+        Row: {
+          chat_date: string
+          created_at: string
+          duration_seconds: number
+          id: string
+          is_unlocked: boolean
+          partner_avatar_url: string | null
+          partner_id: string
+          partner_username: string
+          user_id: string
+        }
+        Insert: {
+          chat_date?: string
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          is_unlocked?: boolean
+          partner_avatar_url?: string | null
+          partner_id: string
+          partner_username: string
+          user_id: string
+        }
+        Update: {
+          chat_date?: string
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          is_unlocked?: boolean
+          partner_avatar_url?: string | null
+          partner_id?: string
+          partner_username?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coin_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      reconnect_requests: {
+        Row: {
+          chat_history_id: string
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          to_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          chat_history_id: string
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          chat_history_id?: string
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconnect_requests_chat_history_id_fkey"
+            columns: ["chat_history_id"]
+            isOneToOne: false
+            referencedRelation: "chat_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      unlock_chat: { Args: { p_chat_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

@@ -94,7 +94,7 @@ export default function LandingPage() {
           </button>
 
           {/* History */}
-          <button className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
+          <button onClick={() => navigate("/history")} className="hidden md:flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-200">
             <Clock className="w-4 h-4" />
             History
           </button>
@@ -120,7 +120,8 @@ export default function LandingPage() {
 
           {/* Separator + Log in */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
-          <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => navigate("/auth")} className="hidden md:flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <LogIn className="w-4 h-4" />
             Log in
           </button>
 
