@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ChevronDown } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, Sparkles, Smile, Maximize2, ChevronDown, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -31,7 +31,7 @@ export default function LiveChat() {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
 
   const [connectionState, setConnectionState] = useState<ConnectionState>("searching");
   const [cameraOn, setCameraOn] = useState(true);
@@ -42,7 +42,8 @@ export default function LiveChat() {
   const [remoteVisible, setRemoteVisible] = useState(false);
   const [gender, setGender] = useState<Gender>("boy");
   const [country, setCountry] = useState<Country>(COUNTRIES[COUNTRIES.length - 1]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const [matchCountry, setMatchCountry] = useState<Country>(COUNTRIES[0]);
   const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
@@ -52,7 +53,7 @@ export default function LiveChat() {
   // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(e.target as Node)) setCountryDropdownOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -69,6 +70,17 @@ export default function LiveChat() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleEnd();
+      if (e.key === "ArrowRight" && !chatOpen) handleNext();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatOpen]);
 
   const startLocalCamera = useCallback(async () => {
     try {
@@ -126,6 +138,7 @@ export default function LiveChat() {
     setConnectionState("searching");
     setMessages([]);
     setInput("");
+    setChatOpen(false);
     simulateMatch();
   }, [clearRemote, simulateMatch]);
 
@@ -156,148 +169,45 @@ export default function LiveChat() {
     setMicOn((v) => !v);
   }, []);
 
+  const matchName = matchGender === "girl" ? "Stranger" : "Stranger";
+
   return (
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
-      {/* Theme toggle */}
-      <div className="absolute top-3 right-3 z-50">
-        <ThemeToggle />
-      </div>
-
-      {/* Video section — reduced height for chat bar */}
-      <div className="flex relative" style={{ height: "calc(100vh - 13rem)" }}>
-        {/* Match Reveal Overlay */}
-        <MatchRevealOverlay
-          visible={connectionState === "revealing"}
-          country={matchCountry}
-          gender={matchGender}
-          onRevealComplete={handleRevealComplete}
-        />
-
-        {/* LEFT — Stranger */}
-        <div className="w-1/2 relative bg-background overflow-hidden">
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className={`w-full h-full object-cover transition-opacity duration-700 ${
-              connectionState === "connected" && remoteVisible ? "opacity-100" : "opacity-0"
-            }`}
-          />
-
-          {/* Searching state */}
-          {connectionState === "searching" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <div className="relative mb-5">
-                <div className="w-14 h-14 rounded-full border border-primary/30 animate-pulse-ring absolute -inset-1" />
-                <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
-                  <Video className="w-5 h-5 text-primary-foreground" />
-                </div>
-              </div>
-              <p className="text-foreground/60 font-display font-medium text-sm tracking-tight">
-                Searching{searchDots}
-              </p>
-            </div>
-          )}
-
-          {/* Waiting for video */}
-          {connectionState === "connected" && !remoteVideoRef.current?.srcObject && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <Video className="w-8 h-8 text-muted-foreground/30 mb-2" />
-              <p className="text-muted-foreground/40 text-xs">Waiting for video…</p>
-            </div>
-          )}
-
-          {/* Stranger label */}
-          <div className="absolute top-4 left-4 z-20">
-            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-              {connectionState === "connected" && (
-                <span className="w-2 h-2 rounded-full bg-[hsl(142_70%_45%)] animate-pulse shrink-0" />
-              )}
-              <span className={connectionState === "connected" ? "text-foreground" : ""}>
-                Stranger
-              </span>
-            </div>
+      {/* ═══ Top Navigation Bar ═══ */}
+      <nav className="flex items-center justify-between px-5 lg:px-8 py-3 shrink-0 z-50 border-b border-border/30">
+        <div className="flex items-center gap-6 lg:gap-8">
+          <button onClick={() => navigate("/")} className="text-xl font-display font-bold text-primary glow-text tracking-tight">
+            Sahara
+          </button>
+          <div className="hidden sm:flex items-center gap-5">
+            <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5">Video Chat</span>
+            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Messages</button>
+            <button onClick={() => navigate("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">About</button>
           </div>
         </div>
-
-        {/* Divider — ultra subtle */}
-        <div className="w-px bg-border/10" />
-
-        {/* RIGHT — You */}
-        <div className="w-1/2 relative bg-background overflow-hidden">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover"
-            style={{ transform: "scaleX(-1)" }}
-          />
-          {!cameraOn && (
-            <div className="absolute inset-0 bg-background flex items-center justify-center">
-              <VideoOff className="w-8 h-8 text-muted-foreground/30" />
-            </div>
-          )}
-
-          {/* You label */}
-          <div className="absolute top-4 right-14 z-20">
-            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-              You
-              {!cameraOn && <VideoOff className="w-3 h-3" />}
-              {!micOn && <MicOff className="w-3 h-3" />}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ Control Dock ═══ */}
-      <div className="absolute bottom-16 left-0 z-40 px-2 w-auto">
-        <div className="flex items-stretch gap-1.5">
-          {/* Start/Next */}
-          <button
-            onClick={handleNext}
-            className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
-              bg-primary text-primary-foreground
-              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] hover:brightness-110
-              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
-              transition-all duration-200 ease-out"
-          >
-            {chatEnabled ? "Next" : "Start"}
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
+            💎 Shop
+          </button>
+          <button onClick={() => navigate("/history")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border text-sm font-medium text-foreground hover:bg-muted/50 transition-colors">
+            🕐 History
           </button>
 
-          {/* Stop */}
-          <button
-            onClick={handleEnd}
-            className="h-16 w-28 rounded-xl font-display font-bold text-base tracking-tight flex flex-col items-center justify-center
-              bg-primary text-primary-foreground
-              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] hover:brightness-110
-              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
-              transition-all duration-200 ease-out"
-          >
-            Stop
-          </button>
-
-          {/* Country */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Country selector */}
+          <div className="relative" ref={countryDropdownRef}>
             <button
-              onClick={() => setDropdownOpen((o) => !o)}
-              className="h-16 w-28 rounded-xl bg-primary text-primary-foreground flex flex-col items-center justify-center gap-1
-                shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] border border-primary/30
-                hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)]
-                active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
-                transition-all duration-200 ease-out"
+              onClick={() => setCountryDropdownOpen((o) => !o)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-sm hover:bg-muted/50 transition-colors"
             >
-              <span className="text-2xl leading-none">{country.flag}</span>
-              <span className="text-[11px] font-medium text-primary-foreground/70">Country</span>
+              <span>{country.flag}</span>
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </button>
-            {dropdownOpen && (
-              <div className="absolute bottom-full mb-2 left-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
+            {countryDropdownOpen && (
+              <div className="absolute top-full mt-1 right-0 w-40 max-h-52 overflow-y-auto rounded-xl glass-strong shadow-lg z-50 py-1 animate-fade-in">
                 {COUNTRIES.map((c) => (
                   <button
                     key={c.code}
-                    onClick={() => { setCountry(c); setDropdownOpen(false); }}
+                    onClick={() => { setCountry(c); setCountryDropdownOpen(false); }}
                     className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm hover:bg-muted/50 transition-colors ${
                       c.code === country.code ? "bg-primary/10 text-primary" : "text-foreground"
                     }`}
@@ -310,115 +220,214 @@ export default function LiveChat() {
             )}
           </div>
 
-          {/* Gender */}
+          {/* Gender toggle */}
           <button
             onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
-            className="h-16 w-28 rounded-xl bg-primary text-primary-foreground flex flex-col items-center justify-center gap-1
-              shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] border border-primary/30
-              hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)]
-              active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_10px_hsl(var(--primary)/0.3)]
-              transition-all duration-200 ease-out"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-sm hover:bg-muted/50 transition-colors"
           >
-            <span className="text-2xl leading-none">{gender === "boy" ? "👦" : "👧"}</span>
-            <span className="text-[11px] font-medium text-primary-foreground/70">I am</span>
+            <span>{gender === "boy" ? "👦" : "👧"}</span>
           </button>
 
-          {/* Camera */}
-          <button
-            onClick={toggleCamera}
-            title={cameraOn ? "Turn off camera" : "Turn on camera"}
-            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1
-              border transition-all duration-200 ease-out
-              ${!cameraOn
-                ? "bg-destructive/20 text-destructive border-destructive/30"
-                : "bg-primary text-primary-foreground border-primary/30 shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] active:translate-y-0 active:scale-[0.97]"
-              }`}
-          >
-            {cameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
-          </button>
+          <ThemeToggle />
+        </div>
+      </nav>
 
-          {/* Mic */}
-          <button
-            onClick={toggleMic}
-            title={micOn ? "Mute" : "Unmute"}
-            className={`h-16 w-16 rounded-xl flex flex-col items-center justify-center gap-1
-              border transition-all duration-200 ease-out
-              ${!micOn
-                ? "bg-destructive/20 text-destructive border-destructive/30"
-                : "bg-primary text-primary-foreground border-primary/30 shadow-[0_2px_16px_hsl(var(--primary)/0.5),0_0_24px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_6px_28px_hsl(var(--primary)/0.6),0_0_40px_hsl(var(--primary)/0.3)] active:translate-y-0 active:scale-[0.97]"
-              }`}
-          >
-            {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-          </button>
+      {/* ═══ Video Panels ═══ */}
+      <div className="flex-1 flex gap-3 p-3 min-h-0">
+        {/* LEFT — Stranger */}
+        <div className="flex-1 relative rounded-2xl overflow-hidden bg-card border border-border/20">
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className={`w-full h-full object-cover transition-opacity duration-700 ${
+              connectionState === "connected" && remoteVisible ? "opacity-100" : "opacity-0"
+            }`}
+          />
+
+          {/* Match Reveal Overlay — inside stranger panel */}
+          <MatchRevealOverlay
+            visible={connectionState === "revealing"}
+            country={matchCountry}
+            gender={matchGender}
+            onRevealComplete={handleRevealComplete}
+          />
+
+          {/* Searching state */}
+          {connectionState === "searching" && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+              <div className="relative mb-5">
+                <div className="w-14 h-14 rounded-full border border-primary/30 animate-pulse absolute -inset-1" />
+                <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
+                  <Video className="w-5 h-5 text-primary-foreground" />
+                </div>
+              </div>
+              <p className="text-muted-foreground font-display font-medium text-sm tracking-tight">
+                Searching{searchDots}
+              </p>
+            </div>
+          )}
+
+          {/* Waiting for video */}
+          {connectionState === "connected" && !remoteVideoRef.current?.srcObject && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+              <VideoOff className="w-12 h-12 text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground/40 text-xs">Waiting for video…</p>
+            </div>
+          )}
+
+          {/* Side action icons */}
+          <div className="absolute top-4 left-4 z-20 flex flex-col gap-3">
+            <button onClick={toggleCamera} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={cameraOn ? "Turn off camera" : "Turn on camera"}>
+              {cameraOn ? <Video className="w-4 h-4 text-foreground" /> : <VideoOff className="w-4 h-4 text-destructive" />}
+            </button>
+            <button onClick={toggleMic} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={micOn ? "Mute" : "Unmute"}>
+              {micOn ? <Mic className="w-4 h-4 text-foreground" /> : <MicOff className="w-4 h-4 text-destructive" />}
+            </button>
+          </div>
+
+          {/* Stranger info badge — bottom right */}
+          {connectionState === "connected" && (
+            <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+              <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-primary/30 flex items-center justify-center text-xs font-bold text-primary">
+                  {matchCountry.flag}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-foreground leading-tight">{matchName}</span>
+                  <span className="text-[10px] text-muted-foreground leading-tight flex items-center gap-1">
+                    {matchCountry.flag} {matchCountry.name}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setChatOpen((o) => !o)}
+                className="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 text-primary" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT — You */}
+        <div className="flex-1 relative rounded-2xl overflow-hidden bg-card border border-border/20">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+            style={{ transform: "scaleX(-1)" }}
+          />
+          {!cameraOn && (
+            <div className="absolute inset-0 bg-card flex items-center justify-center">
+              <VideoOff className="w-12 h-12 text-muted-foreground/30" />
+            </div>
+          )}
+
+          {/* You label */}
+          <div className="absolute bottom-4 left-4 z-20">
+            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              You
+              {!cameraOn && <VideoOff className="w-3 h-3" />}
+              {!micOn && <MicOff className="w-3 h-3" />}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ═══ Full-Width Horizontal Chat Bar ═══ */}
-      <div
-        className={`h-52 shrink-0 w-full flex flex-col overflow-hidden
-          bg-background/95 backdrop-blur-2xl transition-all duration-500
-          neon-chat-box ${messages.length > 0 ? "neon-pulse" : ""}`}
-      >
-        {/* Chat header */}
-        <div className="px-5 py-2 border-b border-primary/15 flex items-center gap-2 shrink-0">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Chat</span>
-        </div>
-
-        {/* Scrollable messages */}
-        <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-5 py-2 space-y-1.5">
-          {messages.length === 0 && (
-            <p className="text-[11px] text-muted-foreground/30 text-center mt-6 italic">No messages yet</p>
-          )}
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
-            >
-              {msg.sender === "system" ? (
-                <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
-              ) : (
-                <span
-                  className={`text-[12px] px-3 py-1.5 rounded-2xl max-w-[40%] break-words ${
-                    msg.sender === "me"
-                      ? "bg-[hsl(330_90%_60%)] text-[hsl(0_0%_100%)] rounded-br-sm"
-                      : "bg-muted/60 text-foreground rounded-bl-sm"
-                  }`}
-                >
-                  {msg.text}
-                </span>
-              )}
+      {/* ═══ Chat Overlay (slide-up panel) ═══ */}
+      {chatOpen && (
+        <div className="absolute bottom-16 right-4 z-50 w-80 h-96 rounded-2xl glass-strong shadow-2xl flex flex-col overflow-hidden border border-primary/20 animate-fade-in">
+          {/* Chat header */}
+          <div className="px-4 py-2.5 border-b border-border/30 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Chat</span>
             </div>
-          ))}
-          <div ref={chatEndRef} />
-        </div>
+            <button onClick={() => setChatOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-        {/* Pinned input — neon orange */}
-        <div className="px-5 py-2.5 border-t border-primary/25 flex items-center gap-3 shrink-0">
-          <input
-            value={input}
-            onChange={(e) => chatEnabled && setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            disabled={!chatEnabled}
-            placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
-            className={`flex-1 rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none transition-all duration-300 ${
-              chatEnabled
-                ? "bg-[hsl(180_50%_8%)] text-[hsl(180_80%_85%)] border-2 border-primary/70 placeholder:text-primary/60 shadow-[inset_0_0_10px_hsl(var(--primary)/0.15),0_0_8px_hsl(var(--primary)/0.2)] focus:border-primary focus:shadow-[0_0_18px_hsl(var(--primary)/0.45),inset_0_0_10px_hsl(var(--primary)/0.15)]"
-                : "bg-muted/15 text-muted-foreground/20 border-2 border-muted/20 placeholder:text-muted-foreground/20 opacity-40 cursor-not-allowed"
-            }`}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!chatEnabled}
-            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-              chatEnabled
-                ? "bg-primary text-primary-foreground hover:scale-110 shadow-[0_0_16px_hsl(var(--primary)/0.5)]"
-                : "bg-muted/20 text-muted-foreground/20 cursor-not-allowed"
-            }`}
-          >
-            <Send className="w-3.5 h-3.5" />
-          </button>
+          {/* Messages */}
+          <div className="flex-1 min-h-0 overflow-y-auto chat-scrollbar px-4 py-2 space-y-1.5">
+            {messages.length === 0 && (
+              <p className="text-[11px] text-muted-foreground/30 text-center mt-12 italic">No messages yet</p>
+            )}
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex chat-msg-enter ${msg.sender === "me" ? "justify-end" : msg.sender === "them" ? "justify-start" : "justify-center"}`}
+              >
+                {msg.sender === "system" ? (
+                  <span className="text-[10px] text-muted-foreground/40 italic">{msg.text}</span>
+                ) : (
+                  <span
+                    className={`text-xs px-3 py-1.5 rounded-2xl max-w-[80%] break-words ${
+                      msg.sender === "me"
+                        ? "bg-primary text-primary-foreground rounded-br-sm"
+                        : "bg-muted/60 text-foreground rounded-bl-sm"
+                    }`}
+                  >
+                    {msg.text}
+                  </span>
+                )}
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="px-3 py-2.5 border-t border-border/30 flex items-center gap-2 shrink-0">
+            <input
+              value={input}
+              onChange={(e) => chatEnabled && setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              disabled={!chatEnabled}
+              placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
+              className="flex-1 rounded-full px-4 py-2 text-sm bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+            <button
+              onClick={handleSend}
+              disabled={!chatEnabled}
+              className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
+      )}
+
+      {/* ═══ Bottom Action Bar ═══ */}
+      <div className="shrink-0 flex items-center justify-between px-5 lg:px-8 py-3 border-t border-border/30">
+        <button
+          onClick={handleEnd}
+          className="flex items-center gap-3 group"
+        >
+          <span className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-xs font-mono text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
+            esc
+          </span>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-foreground">End Video Chat</p>
+            <p className="text-[11px] text-muted-foreground">Press esc key to end video chat</p>
+          </div>
+        </button>
+
+        <button
+          onClick={handleNext}
+          className="flex items-center gap-3 group"
+        >
+          <div className="text-right">
+            <p className="text-sm font-semibold text-foreground">Next Video Chat</p>
+            <p className="text-[11px] text-muted-foreground">Press right key to meet others</p>
+          </div>
+          <span className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
+            <ArrowRight className="w-5 h-5" />
+          </span>
+        </button>
       </div>
     </div>
   );
