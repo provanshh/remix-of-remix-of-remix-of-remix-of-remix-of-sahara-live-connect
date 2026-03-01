@@ -48,6 +48,8 @@ export default function LiveChat() {
 
   const [matchCountry, setMatchCountry] = useState<Country>(COUNTRIES[0]);
   const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [idle, setIdle] = useState(true);
 
   const chatEnabled = connectionState === "connected";
 
@@ -76,7 +78,7 @@ export default function LiveChat() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleEnd();
-      if (e.key === "ArrowRight" && !chatOpen) handleNext();
+      if (e.key === "ArrowRight" && !chatOpen) handleStartMatch();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -125,23 +127,25 @@ export default function LiveChat() {
   }, [clearRemote]);
 
   useEffect(() => {
-    const init = async () => {
-      const ok = await startLocalCamera();
-      if (ok) simulateMatch();
-    };
-    init();
+    startLocalCamera();
     return () => stopLocalCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleStartMatch = useCallback(async () => {
+    if (idle) {
+      const ok = localStreamRef.current || (await startLocalCamera());
+      if (!ok) return;
+      setIdle(false);
+      setHasStarted(true);
+    }
     clearRemote();
     setConnectionState("searching");
     setMessages([]);
     setInput("");
     setChatOpen(false);
     simulateMatch();
-  }, [clearRemote, simulateMatch]);
+  }, [idle, clearRemote, simulateMatch, startLocalCamera]);
 
   const handleEnd = useCallback(() => {
     clearRemote();
@@ -255,16 +259,23 @@ export default function LiveChat() {
           />
 
           {/* Searching state — with online count */}
-          {connectionState === "searching" && (
+          {(connectionState === "searching" || idle) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-card">
               <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4">
                 <Video className="w-7 h-7 text-primary-foreground" />
               </div>
-              <p className="text-3xl font-display font-bold text-primary mb-1">{onlineCount.toLocaleString()}</p>
-              <p className="text-muted-foreground text-sm">+ Online</p>
-              <p className="text-muted-foreground/60 text-xs mt-4">
-                Searching{searchDots}
-              </p>
+              {idle ? (
+                <>
+                  <p className="text-xl font-display font-bold text-foreground mb-1">Ready to Connect</p>
+                  <p className="text-muted-foreground text-sm">Press "Start Match" to begin</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-3xl font-display font-bold text-primary mb-1">{onlineCount.toLocaleString()}</p>
+                  <p className="text-muted-foreground text-sm">+ Online</p>
+                  <p className="text-muted-foreground/60 text-xs mt-4">Searching{searchDots}</p>
+                </>
+              )}
             </div>
           )}
 
@@ -300,7 +311,7 @@ export default function LiveChat() {
             Ready to chat with new friends worldwide? Start matching for an enjoyable and fun communication experience! 🌍 💬
           </p>
           <button
-            onClick={handleNext}
+            onClick={handleStartMatch}
             className="w-fit px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 active:scale-95 transition-all"
           >
             New Chat
@@ -417,21 +428,13 @@ export default function LiveChat() {
         </div>
       )}
 
-      {/* ═══ Bottom Action Bar — 3 buttons like reference ═══ */}
+      {/* ═══ Bottom Action Bar ═══ */}
       <div className="shrink-0 flex items-center gap-3 px-3 lg:px-5 py-3 border-t border-border/30">
-        {/* Gender toggle */}
-        <button
-          onClick={() => setGender(gender === "boy" ? "girl" : "boy")}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
-        >
-          {gender === "boy" ? "👦 Male" : "👧 Female"} & {gender === "boy" ? "👧 Female" : "👦 Male"}
-        </button>
-
         {/* Country / Preferences */}
-        <div className="relative flex-1" ref={countryDropdownRef}>
+        <div className="relative flex-1 max-w-[200px]" ref={countryDropdownRef}>
           <button
             onClick={() => setCountryDropdownOpen((o) => !o)}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-secondary/80 active:scale-[0.98] transition-all"
           >
             <Filter className="w-4 h-4" />
             Preferences {country.flag}
@@ -454,12 +457,27 @@ export default function LiveChat() {
           )}
         </div>
 
-        {/* Start Match / Next */}
+        {/* Dynamic Start Match / Next button */}
         <button
-          onClick={handleNext}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:brightness-110 active:scale-[0.98] transition-all"
+          onClick={handleStartMatch}
+          className={`flex-[2] flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-display font-bold text-base tracking-tight
+            active:scale-[0.96] transition-all duration-300 relative overflow-hidden
+            ${!hasStarted
+              ? "bg-primary text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.5),0_0_60px_hsl(var(--primary)/0.2)] hover:shadow-[0_0_32px_hsl(var(--primary)/0.7),0_0_80px_hsl(var(--primary)/0.3)] hover:brightness-110 animate-glow-pulse"
+              : "bg-accent text-accent-foreground shadow-[0_2px_16px_hsl(var(--accent)/0.3)] hover:shadow-[0_4px_24px_hsl(var(--accent)/0.45)] hover:brightness-110"
+            }`}
         >
-          Start Match <ArrowRight className="w-4 h-4" />
+          {!hasStarted ? (
+            <>
+              <span className="relative z-10">Start Match</span>
+              <ArrowRight className="w-5 h-5 relative z-10" />
+            </>
+          ) : (
+            <>
+              <span>Next</span>
+              <ArrowRight className="w-5 h-5" />
+            </>
+          )}
         </button>
       </div>
     </div>
