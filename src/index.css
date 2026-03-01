@@ -211,6 +211,14 @@
   0%, 100% { background-position: -200% center; }
   50% { background-position: 200% center; }
 }
+@keyframes float-card-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+@keyframes float-card-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(15px); }
+}
 @keyframes neon-border-pulse {
   0% { box-shadow: 0 0 12px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.25); }
   100% { box-shadow: 0 0 12px hsl(var(--primary) / 0.2), 0 0 30px hsl(var(--primary) / 0.08); }
