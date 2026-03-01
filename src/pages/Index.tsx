@@ -80,9 +80,9 @@ export default function LandingPage() {
           <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
             Messages
           </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
+          <button onClick={() => navigate("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
             About
-          </a>
+          </button>
 
           {/* Divider */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
