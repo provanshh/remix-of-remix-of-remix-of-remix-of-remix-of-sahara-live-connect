@@ -108,8 +108,8 @@ export default function About() {
             showBrand ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tighter sahara-shine cursor-default mb-16">
-            sahara
+          <h1 className="text-5xl md:text-7xl font-display font-black tracking-tighter sahara-shine cursor-default mb-16 italic">
+            Sahara
           </h1>
         </div>
 

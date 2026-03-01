@@ -150,7 +150,7 @@ export default function LandingPage() {
         <div className="lg:w-[48%] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0 relative">
           {/* Large brand name */}
           <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter select-none leading-none mb-8 sahara-shine cursor-default italic">
-            sahara
+            Sahara
           </h1>
 
           {/* Online counter */}
