@@ -362,13 +362,13 @@ export default function LiveChat() {
                 ))}
                 <div ref={chatEndRef} />
               </div>
-              <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-2 rounded-full border border-primary/30 shadow-[0_0_6px_hsl(var(--primary)/0.15)] bg-muted/20 px-1.5 py-1">
                 <input
                   value={input}
                   onChange={(e) => chatEnabled && setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Type a message…"
-                  className="flex-1 rounded-full px-3 py-1.5 text-xs bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
+                  className="flex-1 rounded-full px-3 py-1 text-xs bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-colors"
                 />
                 <button
                   onClick={handleSend}
@@ -421,14 +421,16 @@ export default function LiveChat() {
             <div ref={chatEndRef} />
           </div>
           <div className="px-3 py-2.5 border-t border-border/30 flex items-center gap-2 shrink-0">
+            <div className="flex-1 flex items-center gap-2 rounded-full border border-primary/30 shadow-[0_0_6px_hsl(var(--primary)/0.15)] bg-muted/20 px-2 py-1">
             <input
               value={input}
               onChange={(e) => chatEnabled && setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={!chatEnabled}
               placeholder={chatEnabled ? "Type a message…" : "Connect to chat…"}
-              className="flex-1 rounded-full px-4 py-2 text-sm bg-muted/30 text-foreground border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-40"
+              className="flex-1 rounded-full px-2 py-1 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-colors disabled:opacity-40"
             />
+            </div>
             <button
               onClick={handleSend}
               disabled={!chatEnabled}
