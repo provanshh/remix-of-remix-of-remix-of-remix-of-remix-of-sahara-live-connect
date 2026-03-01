@@ -303,22 +303,6 @@ export default function LiveChat() {
             </div>
           )}
 
-          {/* Stranger info badge */}
-          {connectionState === "connected" && (
-            <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
-              <div className="glass rounded-full px-3 py-1.5 flex items-center gap-2">
-                <span className="text-sm">{matchCountry.flag}</span>
-                <span className="text-xs font-semibold text-foreground">Stranger</span>
-                <span className="text-[10px] text-muted-foreground">{matchCountry.name}</span>
-              </div>
-              <button
-                onClick={() => setChatOpen((o) => !o)}
-                className="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <MessageCircle className="w-4 h-4 text-primary" />
-              </button>
-            </div>
-          )}
         </div>
 
         {/* RIGHT — Sidebar */}
