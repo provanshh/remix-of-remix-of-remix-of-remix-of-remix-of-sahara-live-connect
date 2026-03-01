@@ -226,7 +226,7 @@ export default function TextChat() {
   }
 
   return (
-    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
+    <div className="h-screen w-screen flex flex-col overflow-hidden transition-colors duration-500 bg-gradient-to-br from-secondary/60 via-background to-secondary/40">
       {/* ═══ AI Moderator Icebreaker Popup ═══ */}
       {icebreakerTip && (
         <div className="fixed bottom-28 right-4 lg:right-[340px] z-[150] animate-scale-in max-w-[260px]">
