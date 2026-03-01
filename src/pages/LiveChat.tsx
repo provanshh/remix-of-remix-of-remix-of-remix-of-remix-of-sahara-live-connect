@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import MatchRevealOverlay from "@/components/MatchRevealOverlay";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 import UnlockFiltersModal from "@/components/UnlockFiltersModal";
+import FreeMatchAdModal from "@/components/FreeMatchAdModal";
 import CoinShopModal from "@/components/CoinShopModal";
 import saharaLogo from "@/assets/sahara-logo.png";
 
@@ -72,6 +73,8 @@ export default function LiveChat() {
   const [filtersUnlocked, setFiltersUnlocked] = useState(false);
   const [coinBalance] = useState(100); // from wallet
   const [storeShopOpen, setStoreShopOpen] = useState(false);
+  const [freeMatchAdOpen, setFreeMatchAdOpen] = useState(false);
+  const [freeUnlockTimer, setFreeUnlockTimer] = useState<number | null>(null);
   const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [callSeconds, setCallSeconds] = useState(0);
@@ -254,6 +257,27 @@ export default function LiveChat() {
     setInput("");
   }, [input, chatEnabled]);
 
+  // Free unlock timer — auto-lock filters after 60s
+  useEffect(() => {
+    if (freeUnlockTimer === null) return;
+    if (freeUnlockTimer <= 0) {
+      setFiltersUnlocked(false);
+      setFreeUnlockTimer(null);
+      import("sonner").then(({ toast }) => toast.info("Free filter access expired."));
+      return;
+    }
+    const t = setTimeout(() => setFreeUnlockTimer((s) => (s !== null ? s - 1 : null)), 1000);
+    return () => clearTimeout(t);
+  }, [freeUnlockTimer]);
+
+  const handleFreeAdComplete = useCallback(() => {
+    setFreeMatchAdOpen(false);
+    setFiltersUnlocked(true);
+    setFreeUnlockTimer(60);
+    setFilterSheetOpen(true);
+    import("sonner").then(({ toast }) => toast.success("Filters unlocked for 1 minute!"));
+  }, []);
+
   const toggleCamera = useCallback(() => {
     localStreamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
     setCameraOn((v) => !v);
@@ -308,8 +332,11 @@ export default function LiveChat() {
               {formatTime(callSeconds)}
             </div>
           )}
-          <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
+          <button onClick={() => setFreeMatchAdOpen(true)} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all relative overflow-hidden">
             FreeMatch
+            {freeUnlockTimer !== null && (
+              <span className="ml-1 text-xs opacity-80">({freeUnlockTimer}s)</span>
+            )}
           </button>
           <button onClick={() => setStoreShopOpen(true)} className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
             Store
@@ -676,6 +703,7 @@ export default function LiveChat() {
         onUnlock={() => { setFiltersUnlocked(true); setUnlockModalOpen(false); setFilterSheetOpen(true); }}
       />
       <CoinShopModal open={storeShopOpen} onClose={() => setStoreShopOpen(false)} coinBalance={coinBalance} />
+      <FreeMatchAdModal open={freeMatchAdOpen} onClose={() => setFreeMatchAdOpen(false)} onAdComplete={handleFreeAdComplete} />
     </div>
   );
 }
