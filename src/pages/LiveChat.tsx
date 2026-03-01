@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal, Sparkles, AlertTriangle, Flag, Ban, ShieldAlert } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Send, ArrowRight, MessageCircle, X, ChevronDown, Filter, Crown, SlidersHorizontal, Sparkles, AlertTriangle, Flag, Ban, ShieldAlert, Timer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { filterMessage } from "@/lib/profanityFilter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -73,10 +73,24 @@ export default function LiveChat() {
   const [storeShopOpen, setStoreShopOpen] = useState(false);
   const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
+  const [callSeconds, setCallSeconds] = useState(0);
   const lastMessageTimeRef = useRef<number>(0);
   const icebreakerIndexRef = useRef(0);
 
   const chatEnabled = connectionState === "connected";
+
+  // Call timer
+  useEffect(() => {
+    if (connectionState !== "connected") { setCallSeconds(0); return; }
+    const interval = setInterval(() => setCallSeconds((s) => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [connectionState]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -287,6 +301,12 @@ export default function LiveChat() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {connectionState === "connected" && (
+            <div className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-primary/40 text-sm font-medium text-primary">
+              <Timer className="w-3.5 h-3.5" />
+              {formatTime(callSeconds)}
+            </div>
+          )}
           <button onClick={() => navigate("/buy-coins")} className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">
             FreeMatch
           </button>
