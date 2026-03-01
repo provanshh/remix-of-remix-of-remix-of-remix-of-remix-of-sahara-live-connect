@@ -18,6 +18,19 @@ const SMART_SUGGESTIONS = [
   "What's something that made you smile today? 😊",
 ];
 
+const ICEBREAKER_TIPS = [
+  "💡 Try asking about their favorite travel destination!",
+  "💡 Ask what music they're listening to lately!",
+  "💡 Share something funny that happened to you today!",
+  "💡 Ask about their dream superpower — it's always fun!",
+  "💡 Try: \"What's the best meal you've ever had?\"",
+  "💡 Ask: \"If you could live in any movie world, which one?\"",
+  "💡 Try: \"What's a skill you wish you had?\"",
+  "💡 Ask them about a hobby they're passionate about!",
+  "💡 Share your favorite meme genre — bond over humor!",
+  "💡 Try: \"What's the last thing that made you laugh?\"",
+];
+
 export default function TextChat() {
   const navigate = useNavigate();
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -32,6 +45,9 @@ export default function TextChat() {
   const [privacyWarning, setPrivacyWarning] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [onlineCount] = useState(() => Math.floor(Math.random() * 8000) + 12000);
+  const [icebreakerTip, setIcebreakerTip] = useState<string | null>(null);
+  const lastMessageTimeRef = useRef<number>(0);
+  const icebreakerIndexRef = useRef(0);
 
   const chatEnabled = connectionState === "connected";
 
@@ -47,10 +63,57 @@ export default function TextChat() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // AI Moderator: show icebreaker on connect + every 20s of silence
+  useEffect(() => {
+    if (connectionState !== "connected") {
+      setIcebreakerTip(null);
+      return;
+    }
+
+    // Show first icebreaker 2s after connection
+    const initialTimer = setTimeout(() => {
+      const tip = ICEBREAKER_TIPS[icebreakerIndexRef.current % ICEBREAKER_TIPS.length];
+      icebreakerIndexRef.current++;
+      setIcebreakerTip(tip);
+      // Auto-dismiss after 8s
+      setTimeout(() => setIcebreakerTip((prev) => (prev === tip ? null : prev)), 8000);
+    }, 2000);
+
+    // Check every 5s if 20s have passed since last message
+    const silenceTimer = setInterval(() => {
+      const now = Date.now();
+      if (lastMessageTimeRef.current > 0 && now - lastMessageTimeRef.current >= 20000) {
+        const tip = ICEBREAKER_TIPS[icebreakerIndexRef.current % ICEBREAKER_TIPS.length];
+        icebreakerIndexRef.current++;
+        setIcebreakerTip(tip);
+        lastMessageTimeRef.current = now; // reset so next tip is 20s later
+        setTimeout(() => setIcebreakerTip((prev) => (prev === tip ? null : prev)), 8000);
+      }
+    }, 5000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(silenceTimer);
+    };
+  }, [connectionState]);
+
+  // Track last message time
+  useEffect(() => {
+    if (messages.length > 0) {
+      const last = messages[messages.length - 1];
+      if (last.sender === "me" || last.sender === "them") {
+        lastMessageTimeRef.current = Date.now();
+      }
+    }
+  }, [messages]);
+
   const handleStartMatch = useCallback(() => {
     setConnectionState("searching");
     setMessages([{ text: "Looking for someone…", sender: "system" }]);
     setInput("");
+    setIcebreakerTip(null);
+    icebreakerIndexRef.current = 0;
+    lastMessageTimeRef.current = 0;
 
     // Simulate finding a stranger (real connection would use WebRTC/Realtime)
     setTimeout(() => {
@@ -102,6 +165,30 @@ export default function TextChat() {
 
   return (
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden transition-colors duration-500">
+      {/* ═══ AI Moderator Icebreaker Popup ═══ */}
+      {icebreakerTip && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[150] animate-scale-in max-w-sm w-[90%]">
+          <div className="relative bg-card border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_0_30px_hsl(var(--primary)/0.2)]">
+            <button
+              onClick={() => setIcebreakerTip(null)}
+              className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              ×
+            </button>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Moderator</span>
+            </div>
+            <p className="text-sm text-foreground leading-relaxed">{icebreakerTip}</p>
+            <div className="mt-3 h-0.5 w-full bg-muted/30 rounded-full overflow-hidden">
+              <div className="h-full bg-primary/50 rounded-full" style={{ animation: "shrink-bar 8s linear forwards" }} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══ Privacy Warning Popup ═══ */}
       {privacyWarning && (
         <div className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4" onClick={() => setPrivacyWarning(false)}>
