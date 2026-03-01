@@ -79,9 +79,9 @@ export default function LandingPage() {
           <a href="#" className="text-sm font-semibold text-foreground hover:text-primary transition-colors hidden md:block">
             Video Chat
           </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
+          <button onClick={() => navigate("/text-chat")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
             Messages
-          </a>
+          </button>
           <button onClick={() => navigate("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
             About
           </button>

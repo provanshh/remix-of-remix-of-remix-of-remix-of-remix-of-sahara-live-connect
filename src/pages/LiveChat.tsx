@@ -192,7 +192,7 @@ export default function LiveChat() {
           </button>
           <div className="hidden sm:flex items-center gap-6">
             <span className="text-sm font-semibold text-foreground border-b-2 border-primary pb-0.5 uppercase tracking-wider">Video Chat</span>
-            <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Message</button>
+            <button onClick={() => navigate("/text-chat")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Message</button>
             <button onClick={() => navigate("/history")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">History</button>
           </div>
         </div>
