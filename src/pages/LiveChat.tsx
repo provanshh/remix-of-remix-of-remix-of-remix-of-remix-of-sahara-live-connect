@@ -340,11 +340,11 @@ export default function LiveChat() {
 
           {/* Camera/Mic controls overlay */}
           <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
-            <button onClick={toggleCamera} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={cameraOn ? "Turn off camera" : "Turn on camera"}>
-              {cameraOn ? <Video className="w-4 h-4 text-foreground" /> : <VideoOff className="w-4 h-4 text-destructive" />}
+            <button onClick={toggleCamera} className="w-9 h-9 rounded-lg bg-primary/20 backdrop-blur-sm border border-primary/30 shadow-[0_0_8px_hsl(var(--primary)/0.25)] flex items-center justify-center hover:bg-primary/30 transition-colors" title={cameraOn ? "Turn off camera" : "Turn on camera"}>
+              {cameraOn ? <Video className="w-4 h-4 text-primary" /> : <VideoOff className="w-4 h-4 text-destructive" />}
             </button>
-            <button onClick={toggleMic} className="w-9 h-9 rounded-lg glass flex items-center justify-center hover:bg-muted/40 transition-colors" title={micOn ? "Mute" : "Unmute"}>
-              {micOn ? <Mic className="w-4 h-4 text-foreground" /> : <MicOff className="w-4 h-4 text-destructive" />}
+            <button onClick={toggleMic} className="w-9 h-9 rounded-lg bg-primary/20 backdrop-blur-sm border border-primary/30 shadow-[0_0_8px_hsl(var(--primary)/0.25)] flex items-center justify-center hover:bg-primary/30 transition-colors" title={micOn ? "Mute" : "Unmute"}>
+              {micOn ? <Mic className="w-4 h-4 text-primary" /> : <MicOff className="w-4 h-4 text-destructive" />}
             </button>
           </div>
 
