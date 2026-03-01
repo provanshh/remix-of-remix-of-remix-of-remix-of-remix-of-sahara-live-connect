@@ -76,13 +76,13 @@ export default function LandingPage() {
         </span>
         <div className="flex items-center gap-3 md:gap-5">
           {/* Nav links */}
-          <a href="#" className="text-sm font-semibold text-foreground hover:text-primary transition-colors hidden md:block">
+          <a href="#" className="nav-link-hover text-sm font-semibold text-foreground hover:text-primary transition-colors hidden md:block pb-0.5">
             Video Chat
           </a>
-          <button onClick={() => navigate("/text-chat")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
+          <button onClick={() => navigate("/text-chat")} className="nav-link-hover text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block pb-0.5">
             Messages
           </button>
-          <button onClick={() => navigate("/about")} className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block">
+          <button onClick={() => navigate("/about")} className="nav-link-hover text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block pb-0.5">
             About
           </button>
 
