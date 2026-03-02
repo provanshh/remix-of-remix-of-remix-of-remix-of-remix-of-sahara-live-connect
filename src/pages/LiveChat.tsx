@@ -9,6 +9,7 @@ import UnlockFiltersModal from "@/components/UnlockFiltersModal";
 import FreeMatchAdModal from "@/components/FreeMatchAdModal";
 import CoinShopModal from "@/components/CoinShopModal";
 import SubscriptionPromptModal from "@/components/SubscriptionPromptModal";
+import MorphingShapes from "@/components/MorphingShapes";
 import saharaLogo from "@/assets/sahara-logo.png";
 
 const COUNTRIES = [
@@ -515,9 +516,13 @@ export default function LiveChat() {
           {/* Searching state — with online count */}
           {(connectionState === "searching" || idle) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-card">
-              <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4">
-                <Video className="w-7 h-7 text-primary-foreground" />
-              </div>
+              {idle ? (
+                <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4">
+                  <Video className="w-7 h-7 text-primary-foreground" />
+                </div>
+              ) : (
+                <MorphingShapes />
+              )}
               {idle ? (
                 <>
                   <p className="text-xl font-display font-bold text-foreground mb-1">Ready to Connect</p>
