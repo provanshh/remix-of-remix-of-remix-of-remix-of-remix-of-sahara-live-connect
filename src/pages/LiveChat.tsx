@@ -11,6 +11,8 @@ import CoinShopModal from "@/components/CoinShopModal";
 import SubscriptionPromptModal from "@/components/SubscriptionPromptModal";
 import MorphingShapes from "@/components/MorphingShapes";
 import saharaLogo from "@/assets/sahara-logo.png";
+import { useRealtimeMatch } from "@/hooks/useRealtimeMatch";
+import { useAuth } from "@/contexts/AuthContext";
 
 const COUNTRIES = [
   { code: "US", name: "USA", flag: "🇺🇸" },
@@ -47,6 +49,7 @@ const ICEBREAKER_TIPS = [
 
 export default function LiveChat() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -64,7 +67,6 @@ export default function LiveChat() {
   const [country, setCountry] = useState<Country>(COUNTRIES[COUNTRIES.length - 1]);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [onlineCount] = useState(() => Math.floor(Math.random() * 15000) + 20000);
 
   const [matchCountry, setMatchCountry] = useState<Country>(COUNTRIES[0]);
   const [matchGender, setMatchGender] = useState<"boy" | "girl" | null>(null);
@@ -86,6 +88,41 @@ export default function LiveChat() {
   const [callSeconds, setCallSeconds] = useState(0);
   const lastMessageTimeRef = useRef<number>(0);
   const icebreakerIndexRef = useRef(0);
+
+  // Real-time matching hook
+  const {
+    status: matchStatus,
+    matchInfo,
+    onlineCount,
+    joinQueue,
+    leaveQueue,
+    endSession,
+    sendMessage: sendRealtimeMessage,
+  } = useRealtimeMatch({
+    onMatched: (match) => {
+      // Find country info for reveal overlay
+      const foundCountry = COUNTRIES.find((c) => c.code === match.partnerCountry) || COUNTRIES[0];
+      const foundGender = match.partnerGender === "Female" ? "girl" as const : "boy" as const;
+      setMatchCountry(foundCountry);
+      setMatchGender(foundGender);
+      setConnectionState("revealing");
+    },
+    onMessage: (msg) => {
+      setMessages((m) => [...m, { text: msg.text, sender: "them" }]);
+    },
+    onPartnerDisconnected: () => {
+      clearRemote();
+      setMessages((m) => [...m, { text: "Partner disconnected.", sender: "system" }]);
+      setConnectionState("searching");
+      // Auto-search for next match
+      if (user) {
+        joinQueue(
+          gender === "boy" ? "Male" : "Female",
+          country.code !== "XX" ? country.code : undefined
+        );
+      }
+    },
+  });
 
   const chatEnabled = connectionState === "connected";
 
@@ -198,18 +235,22 @@ export default function LiveChat() {
     setRemoteVisible(true);
   }, []);
 
-  const simulateMatch = useCallback(() => {
+  const startRealMatch = useCallback(() => {
     setConnectionState("searching");
     clearRemote();
     setMessages([{ text: "Looking for someone…", sender: "system" }]);
-    const randomCountry = COUNTRIES[Math.floor(Math.random() * (COUNTRIES.length - 1))];
-    const randomGender = Math.random() > 0.5 ? ("boy" as const) : ("girl" as const);
-    setTimeout(() => {
-      setMatchCountry(randomCountry);
-      setMatchGender(randomGender);
-      setConnectionState("revealing");
-    }, 3000);
-  }, [clearRemote]);
+    
+    if (!user) {
+      setMessages([{ text: "Please log in to start matching.", sender: "system" }]);
+      setConnectionState("searching");
+      return;
+    }
+
+    joinQueue(
+      gender === "boy" ? "Male" : "Female",
+      country.code !== "XX" ? country.code : undefined
+    );
+  }, [clearRemote, user, joinQueue, gender, country]);
 
   useEffect(() => {
     startLocalCamera();
@@ -232,25 +273,27 @@ export default function LiveChat() {
     setIcebreakerTip(null);
     icebreakerIndexRef.current = 0;
     lastMessageTimeRef.current = 0;
-    simulateMatch();
-  }, [idle, clearRemote, simulateMatch, startLocalCamera]);
+    startRealMatch();
+  }, [idle, clearRemote, startRealMatch, startLocalCamera]);
 
   const handleStop = useCallback(() => {
     clearRemote();
     stopLocalCamera();
+    leaveQueue();
     setHasStarted(false);
     setIdle(true);
     setMessages([]);
     setIcebreakerTip(null);
     icebreakerIndexRef.current = 0;
     lastMessageTimeRef.current = 0;
-  }, [clearRemote, stopLocalCamera]);
+  }, [clearRemote, stopLocalCamera, leaveQueue]);
 
   const handleEnd = useCallback(() => {
     clearRemote();
     stopLocalCamera();
+    endSession();
     navigate("/");
-  }, [clearRemote, stopLocalCamera, navigate]);
+  }, [clearRemote, stopLocalCamera, endSession, navigate]);
 
   const handleSend = useCallback(() => {
     if (!chatEnabled || !input.trim()) return;
@@ -259,9 +302,10 @@ export default function LiveChat() {
       setMessages((m) => [...m, { text: "Blocked: inappropriate language.", sender: "system" }]);
     } else {
       setMessages((m) => [...m, { text: result.filtered, sender: "me" }]);
+      sendRealtimeMessage(result.filtered);
     }
     setInput("");
-  }, [input, chatEnabled]);
+  }, [input, chatEnabled, sendRealtimeMessage]);
 
   // Free unlock timer — auto-lock filters after 60s
   useEffect(() => {
@@ -492,7 +536,7 @@ export default function LiveChat() {
                         setReportMenuOpen(false);
                         clearRemote();
                         setMessages([{ text: `Report submitted: ${label}. Finding next stranger…`, sender: "system" }]);
-                        setTimeout(() => simulateMatch(), 1500);
+                        setTimeout(() => startRealMatch(), 1500);
                       }}
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left"
                     >
