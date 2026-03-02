@@ -40,10 +40,10 @@ export default function MatchRevealOverlay({
 
   const label =
     gender === "boy"
-      ? `He is from ${country.name} ${country.flag}`
+      ? `He is from ${country.name}`
       : gender === "girl"
-      ? `She is from ${country.name} ${country.flag}`
-      : `Your match is from ${country.name} ${country.flag}`;
+      ? `She is from ${country.name}`
+      : `Your match is from ${country.name}`;
 
   return (
     <div
@@ -79,7 +79,7 @@ export default function MatchRevealOverlay({
           </Avatar>
         </div>
 
-        {/* Country text */}
+        {/* Country flag + text */}
         <div
           className={`text-center transition-all duration-700 delay-300 ease-out ${
             phase === "enter"
@@ -87,6 +87,7 @@ export default function MatchRevealOverlay({
               : "opacity-0 scale-90 translate-y-2"
           }`}
         >
+          <span className="text-5xl md:text-6xl block mb-2">{country.flag}</span>
           <p className="font-display font-bold text-xl md:text-2xl text-foreground tracking-tight glow-text">
             {label}
           </p>
