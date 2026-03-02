@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Facebook, LogIn, Youtube } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,10 +9,21 @@ import CoinShopModal from "@/components/CoinShopModal";
 import LandingInfoSection from "@/components/LandingInfoSection";
 import saharaLogo from "@/assets/sahara-logo.png";
 import { useOnlineMembers } from "@/hooks/useOnlineMembers";
+import profile1 from "@/assets/profile-1.jpg";
+import profile2 from "@/assets/profile-2.jpg";
+import profile3 from "@/assets/profile-3.jpg";
+import profile4 from "@/assets/profile-4.jpg";
+import profile5 from "@/assets/profile-5.jpg";
+import profile6 from "@/assets/profile-6.jpg";
 
-const COUNTRY_FLAGS: Record<string, string> = {
-  US: "🇺🇸", GB: "🇬🇧", DE: "🇩🇪", FR: "🇫🇷", IN: "🇮🇳", JP: "🇯🇵", KR: "🇰🇷", BR: "🇧🇷", AU: "🇦🇺", CA: "🇨🇦", MX: "🇲🇽",
-};
+const STATIC_PROFILES = [
+  { image: profile1, name: "Sophia", age: 24, flag: "🇺🇸" },
+  { image: profile2, name: "Aiko", age: 22, flag: "🇯🇵" },
+  { image: profile3, name: "Carlos", age: 27, flag: "🇧🇷" },
+  { image: profile4, name: "Emma", age: 23, flag: "🇬🇧" },
+  { image: profile5, name: "Liam", age: 25, flag: "🇩🇪" },
+  { image: profile6, name: "Priya", age: 21, flag: "🇮🇳" },
+];
 
 const GENDERS = ["Male", "Female"] as const;
 const COUNTRIES = [
@@ -39,14 +50,8 @@ export default function LandingPage() {
 
   const { members, onlineCount } = useOnlineMembers();
 
-  // Convert online members to carousel profiles
-  const carouselProfiles = useMemo(() => {
-    return members.map((m) => ({
-      image: m.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.username}`,
-      name: m.username,
-      flag: COUNTRY_FLAGS[m.country || ""] || "🌍",
-    }));
-  }, [members]);
+  // Use static profiles for the carousel
+  const carouselProfiles = STATIC_PROFILES;
 
   // Close dropdowns on outside click
   useEffect(() => {
