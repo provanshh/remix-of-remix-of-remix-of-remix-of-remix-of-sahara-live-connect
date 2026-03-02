@@ -4,7 +4,7 @@ import ProfileCard from "./ProfileCard";
 interface Profile {
   image: string;
   name: string;
-  age: number;
+  age?: number;
   flag: string;
 }
 
@@ -22,10 +22,9 @@ function ScrollColumn({ profiles, direction }: { profiles: Profile[]; direction:
 
   useEffect(() => {
     const el = colRef.current;
-    if (!el) return;
+    if (!el || profiles.length === 0) return;
 
     const singleSetHeight = el.scrollHeight / 3;
-    // Start the "down" column offset so it looks different
     if (direction === "down" && scrollPos.current === 0) {
       scrollPos.current = singleSetHeight * 0.5;
     }
@@ -55,7 +54,9 @@ function ScrollColumn({ profiles, direction }: { profiles: Profile[]; direction:
 
     animationRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [isPaused, direction]);
+  }, [isPaused, direction, profiles.length]);
+
+  if (profiles.length === 0) return null;
 
   return (
     <div
@@ -66,7 +67,7 @@ function ScrollColumn({ profiles, direction }: { profiles: Profile[]; direction:
       <div ref={colRef} className="will-change-transform flex flex-col gap-3">
         {tripled.map((p, i) => (
           <div key={i} className={i % 2 === 0 ? "h-64" : "h-48"}>
-            <ProfileCard image={p.image} name={p.name} age={p.age} flag={p.flag} className="h-full" />
+            <ProfileCard image={p.image} name={p.name} age={p.age ?? 0} flag={p.flag} className="h-full" />
           </div>
         ))}
       </div>
@@ -75,19 +76,31 @@ function ScrollColumn({ profiles, direction }: { profiles: Profile[]; direction:
 }
 
 export default function AutoScrollCarousel({ profiles }: AutoScrollCarouselProps) {
+  if (profiles.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto animate-pulse">
+            <span className="text-2xl">👥</span>
+          </div>
+          <p className="text-muted-foreground text-sm">Waiting for members to come online...</p>
+        </div>
+      </div>
+    );
+  }
+
   const mid = Math.ceil(profiles.length / 2);
   const leftProfiles = profiles.slice(0, mid);
   const rightProfiles = profiles.slice(mid);
 
   return (
     <div className="h-full overflow-hidden relative">
-      {/* Fade edges */}
       <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
       <div className="flex gap-3 px-1 h-full">
         <ScrollColumn profiles={leftProfiles} direction="up" />
-        <ScrollColumn profiles={rightProfiles} direction="down" />
+        <ScrollColumn profiles={rightProfiles.length > 0 ? rightProfiles : leftProfiles} direction="down" />
       </div>
     </div>
   );

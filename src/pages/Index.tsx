@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Facebook, LogIn, Youtube } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -8,22 +8,11 @@ import AutoScrollCarousel from "@/components/AutoScrollCarousel";
 import CoinShopModal from "@/components/CoinShopModal";
 import LandingInfoSection from "@/components/LandingInfoSection";
 import saharaLogo from "@/assets/sahara-logo.png";
+import { useOnlineMembers } from "@/hooks/useOnlineMembers";
 
-import profile1 from "@/assets/profile-1.jpg";
-import profile2 from "@/assets/profile-2.jpg";
-import profile3 from "@/assets/profile-3.jpg";
-import profile4 from "@/assets/profile-4.jpg";
-import profile5 from "@/assets/profile-5.jpg";
-import profile6 from "@/assets/profile-6.jpg";
-
-const PROFILES = [
-  { image: profile1, name: "Jisu", age: 23, flag: "🇰🇷" },
-  { image: profile3, name: "Mei", age: 21, flag: "🇻🇳" },
-  { image: profile2, name: "Joshua", age: 25, flag: "🇺🇸" },
-  { image: profile4, name: "Amelia", age: 22, flag: "🇬🇧" },
-  { image: profile5, name: "David", age: 24, flag: "🇩🇪" },
-  { image: profile6, name: "Arjun", age: 20, flag: "🇮🇳" },
-];
+const COUNTRY_FLAGS: Record<string, string> = {
+  US: "🇺🇸", GB: "🇬🇧", DE: "🇩🇪", FR: "🇫🇷", IN: "🇮🇳", JP: "🇯🇵", KR: "🇰🇷", BR: "🇧🇷", AU: "🇦🇺", CA: "🇨🇦", MX: "🇲🇽",
+};
 
 const GENDERS = ["Male", "Female"] as const;
 const COUNTRIES = [
@@ -44,10 +33,20 @@ export default function LandingPage() {
   const [country, setCountry] = useState(COUNTRIES[0]);
   const [genderOpen, setGenderOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
-  const [onlineCount, setOnlineCount] = useState(179545);
   const [shopOpen, setShopOpen] = useState(false);
   const genderRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
+
+  const { members, onlineCount } = useOnlineMembers();
+
+  // Convert online members to carousel profiles
+  const carouselProfiles = useMemo(() => {
+    return members.map((m) => ({
+      image: m.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.username}`,
+      name: m.username,
+      flag: COUNTRY_FLAGS[m.country || ""] || "🌍",
+    }));
+  }, [members]);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -57,14 +56,6 @@ export default function LandingPage() {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // Simulate fluctuating online count
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOnlineCount((c) => c + Math.floor(Math.random() * 21) - 10);
-    }, 3000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -77,7 +68,6 @@ export default function LandingPage() {
           <img src={saharaLogo} alt="Sahara" className="h-9 w-auto" />
         </span>
 
-        {/* Nav links - centered between logo and right section */}
         <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
           <button onClick={() => navigate("/live")} className="nav-link-hover text-base font-semibold text-white hover:text-primary transition-colors pb-0.5">
             Video Chat
@@ -91,7 +81,6 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-3 md:gap-4">
-          {/* Shop & History */}
           <div className="hidden md:flex items-center gap-2">
             <button onClick={() => setShopOpen(true)} className="flex items-center gap-1.5 h-9 px-4 rounded-full border border-border/40 bg-secondary/60 text-sm font-medium text-foreground hover:bg-primary/15 hover:border-primary/40 hover:scale-105 transition-all duration-200">
               <ShoppingBag className="w-4 h-4 text-amber-400" />
@@ -103,10 +92,8 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* Divider */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
 
-          {/* Social icons */}
           <div className="hidden lg:flex items-center gap-2">
             <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 hover:bg-primary/10">
               <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" fill="url(#ig-gradient)">
@@ -133,7 +120,6 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* Separator + Log in */}
           <div className="hidden md:block w-px h-5 bg-border/30" />
           <button onClick={() => navigate("/auth")} className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-white hover:text-primary hover:scale-105 transition-all duration-200">
             <LogIn className="w-4 h-4" />
@@ -148,20 +134,18 @@ export default function LandingPage() {
       <div className="relative z-10 flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
         {/* ─── Left Panel: Brand + CTA ─── */}
         <div className="lg:w-[48%] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0 relative">
-          {/* Large brand name */}
           <h1 className="text-7xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter select-none leading-none mb-8 sahara-shine cursor-default italic">
             Sahara
           </h1>
 
-          {/* Online counter */}
+          {/* Live online counter */}
           <div className="flex items-center gap-2.5 mb-12">
             <span className="w-2.5 h-2.5 rounded-full bg-[hsl(142_70%_45%)] animate-pulse" />
             <span className="text-base font-medium text-foreground">
-              {onlineCount.toLocaleString()} are matching now!
+              {onlineCount > 0 ? `${onlineCount.toLocaleString()} online now!` : "Connecting..."}
             </span>
           </div>
 
-          {/* Stats */}
           <div className="mb-12">
             <StatsCounter />
           </div>
@@ -172,8 +156,7 @@ export default function LandingPage() {
             <div className="relative" ref={genderRef}>
               <button
                 onClick={() => setGenderOpen((o) => !o)}
-                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5
-                  hover:bg-secondary/80 transition-all duration-200"
+                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5 hover:bg-secondary/80 transition-all duration-200"
               >
                 <span className="text-lg">{gender === "Male" ? "👦" : "👧"}</span>
                 <span className="text-sm font-medium">Gender</span>
@@ -185,9 +168,7 @@ export default function LandingPage() {
                     <button
                       key={g}
                       onClick={() => { setGender(g); setGenderOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${
-                        g === gender ? "text-primary" : "text-foreground"
-                      }`}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${g === gender ? "text-primary" : "text-foreground"}`}
                     >
                       <span>{g === "Male" ? "👦" : "👧"}</span>
                       <span className="font-medium">{g}</span>
@@ -201,8 +182,7 @@ export default function LandingPage() {
             <div className="relative" ref={countryRef}>
               <button
                 onClick={() => setCountryOpen((o) => !o)}
-                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5
-                  hover:bg-secondary/80 transition-all duration-200"
+                className="h-12 px-5 rounded-full bg-secondary text-foreground flex items-center gap-2.5 hover:bg-secondary/80 transition-all duration-200"
               >
                 <span className="text-lg">{country.flag}</span>
                 <span className="text-sm font-medium">Country</span>
@@ -214,9 +194,7 @@ export default function LandingPage() {
                     <button
                       key={c.code}
                       onClick={() => { setCountry(c); setCountryOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${
-                        c.code === country.code ? "text-primary" : "text-foreground"
-                      }`}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors ${c.code === country.code ? "text-primary" : "text-foreground"}`}
                     >
                       <span className="text-base">{c.flag}</span>
                       <span className="font-medium">{c.name}</span>
@@ -229,11 +207,7 @@ export default function LandingPage() {
             {/* Start Video Chat CTA */}
             <button
               onClick={() => navigate("/live")}
-              className="h-12 px-8 rounded-full bg-foreground text-background flex items-center gap-2.5
-                font-display font-bold text-sm tracking-tight
-                shadow-[0_4px_20px_hsl(var(--foreground)/0.2)]
-                hover:scale-105 hover:shadow-[0_6px_30px_hsl(var(--foreground)/0.3)]
-                active:scale-[0.98] transition-all duration-200"
+              className="h-12 px-8 rounded-full bg-foreground text-background flex items-center gap-2.5 font-display font-bold text-sm tracking-tight shadow-[0_4px_20px_hsl(var(--foreground)/0.2)] hover:scale-105 hover:shadow-[0_6px_30px_hsl(var(--foreground)/0.3)] active:scale-[0.98] transition-all duration-200"
             >
               <Video className="w-5 h-5" />
               Start Video Chat
@@ -241,9 +215,9 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* ─── Right Panel: Auto-Scrolling Carousel ─── */}
+        {/* ─── Right Panel: Live Members Carousel ─── */}
         <div className="lg:w-[52%] px-4 lg:px-6 py-6 lg:py-4 h-[calc(100vh-80px)]">
-          <AutoScrollCarousel profiles={PROFILES} />
+          <AutoScrollCarousel profiles={carouselProfiles} />
         </div>
       </div>
       <LandingInfoSection />
