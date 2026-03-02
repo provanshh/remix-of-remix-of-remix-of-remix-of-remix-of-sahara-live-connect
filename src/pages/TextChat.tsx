@@ -327,13 +327,18 @@ export default function TextChat() {
           )}
 
           {connectionState === "searching" && (
-            <div className="flex flex-col items-center gap-4">
+            <div className="relative flex flex-col items-center gap-4">
+              {/* Pulsing rings */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none -top-8">
+                <div className="w-40 h-40 rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '2s' }} />
+                <div className="absolute w-56 h-56 rounded-full border border-primary/10 animate-ping" style={{ animationDuration: '3s' }} />
+              </div>
               <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-muted/20 border-2 border-primary/30 flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               </div>
-              <p className="text-3xl font-display font-bold text-primary">{onlineCount.toLocaleString()}</p>
+              <p className="text-3xl font-display font-bold text-primary animate-pulse">{onlineCount.toLocaleString()}</p>
               <p className="text-muted-foreground text-sm">+ Online</p>
-              <p className="text-muted-foreground/60 text-xs">Searching{searchDots}</p>
+              <p className="text-primary/60 text-sm font-medium tracking-widest uppercase animate-pulse">Matching{searchDots}</p>
             </div>
           )}
 
