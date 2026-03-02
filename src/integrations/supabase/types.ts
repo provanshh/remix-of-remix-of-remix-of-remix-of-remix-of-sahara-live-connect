@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          status: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          status?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          status?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
       chat_history: {
         Row: {
           chat_date: string
@@ -70,6 +97,66 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      match_queue: {
+        Row: {
+          created_at: string
+          id: string
+          matched_at: string | null
+          matched_with: string | null
+          preferred_country: string | null
+          preferred_gender: string | null
+          session_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_with?: string | null
+          preferred_country?: string | null
+          preferred_gender?: string | null
+          session_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_with?: string | null
+          preferred_country?: string | null
+          preferred_gender?: string | null
+          session_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      online_presence: {
+        Row: {
+          id: string
+          last_seen: string
+          metadata: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_seen?: string
+          metadata?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_seen?: string
+          metadata?: Json | null
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -141,6 +228,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_online_count: { Args: never; Returns: number }
       unlock_chat: { Args: { p_chat_id: string }; Returns: Json }
     }
     Enums: {
