@@ -12,6 +12,7 @@ import SubscriptionPromptModal from "@/components/SubscriptionPromptModal";
 import MorphingShapes from "@/components/MorphingShapes";
 import saharaLogo from "@/assets/sahara-logo.png";
 import { useRealtimeMatch } from "@/hooks/useRealtimeMatch";
+import { useWebRTC } from "@/hooks/useWebRTC";
 import { useAuth } from "@/contexts/AuthContext";
 
 const COUNTRIES = [
@@ -55,6 +56,8 @@ export default function LiveChat() {
   const localStreamRef = useRef<MediaStream | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const countryDropdownRef = useRef<HTMLDivElement>(null);
+  const isInitiatorRef = useRef(false);
+  const [webrtcEnabled, setWebrtcEnabled] = useState(false);
 
   const [connectionState, setConnectionState] = useState<ConnectionState>("searching");
   const [cameraOn, setCameraOn] = useState(true);
@@ -89,6 +92,13 @@ export default function LiveChat() {
   const lastMessageTimeRef = useRef<number>(0);
   const icebreakerIndexRef = useRef(0);
 
+  const handleRemoteStream = useCallback((stream: MediaStream) => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = stream;
+    }
+    setRemoteVisible(true);
+  }, []);
+
   // Real-time matching hook
   const {
     status: matchStatus,
@@ -97,6 +107,7 @@ export default function LiveChat() {
     joinQueue,
     leaveQueue,
     endSession,
+    sendSignal,
     sendMessage: sendRealtimeMessage,
   } = useRealtimeMatch({
     onMatched: (match) => {
@@ -106,12 +117,22 @@ export default function LiveChat() {
       setMatchCountry(foundCountry);
       setMatchGender(foundGender);
       setConnectionState("revealing");
+      // Determine initiator: the one whose ID is "smaller" lexicographically
+      if (user) {
+        isInitiatorRef.current = user.id < match.partnerId;
+      }
+      setWebrtcEnabled(true);
     },
     onMessage: (msg) => {
       setMessages((m) => [...m, { text: msg.text, sender: "them" }]);
     },
+    onSignal: (data, type) => {
+      webrtcRef.current?.handleSignal(data, type);
+    },
     onPartnerDisconnected: () => {
       clearRemote();
+      webrtcRef.current?.cleanup();
+      setWebrtcEnabled(false);
       setMessages((m) => [...m, { text: "Partner disconnected.", sender: "system" }]);
       setConnectionState("searching");
       // Auto-search for next match
@@ -123,6 +144,19 @@ export default function LiveChat() {
       }
     },
   });
+
+  const webrtcRef = useRef<ReturnType<typeof useWebRTC> | null>(null);
+
+  const webrtc = useWebRTC({
+    localStream: localStreamRef.current,
+    onRemoteStream: handleRemoteStream,
+    sendSignal,
+    isInitiator: isInitiatorRef.current,
+    enabled: webrtcEnabled,
+  });
+
+  // Keep ref in sync
+  webrtcRef.current = webrtc;
 
   const chatEnabled = connectionState === "connected";
 
@@ -266,6 +300,8 @@ export default function LiveChat() {
       setHasStarted(true);
     }
     clearRemote();
+    webrtcRef.current?.cleanup();
+    setWebrtcEnabled(false);
     setConnectionState("searching");
     setMessages([]);
     setInput("");
@@ -280,6 +316,8 @@ export default function LiveChat() {
     clearRemote();
     stopLocalCamera();
     leaveQueue();
+    webrtcRef.current?.cleanup();
+    setWebrtcEnabled(false);
     setHasStarted(false);
     setIdle(true);
     setMessages([]);
@@ -291,6 +329,8 @@ export default function LiveChat() {
   const handleEnd = useCallback(() => {
     clearRemote();
     stopLocalCamera();
+    webrtcRef.current?.cleanup();
+    setWebrtcEnabled(false);
     endSession();
     navigate("/");
   }, [clearRemote, stopLocalCamera, endSession, navigate]);
