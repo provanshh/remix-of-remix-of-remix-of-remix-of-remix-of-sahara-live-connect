@@ -98,10 +98,10 @@ Deno.serve(async (req) => {
                 { user_id: match.user_id, status: "in_chat", last_seen: new Date().toISOString() },
               ], { onConflict: "user_id" });
 
-            // Get partner profile
+            // Get partner's actual profile data (real location & gender)
             const { data: partnerProfile } = await supabase
               .from("profiles")
-              .select("username, avatar_url")
+              .select("username, avatar_url, gender, country")
               .eq("id", match.user_id)
               .single();
 
@@ -111,8 +111,8 @@ Deno.serve(async (req) => {
               partner_id: match.user_id,
               partner_username: partnerProfile?.username || "Anonymous",
               partner_avatar: partnerProfile?.avatar_url,
-              partner_gender: match.preferred_gender,
-              partner_country: match.preferred_country,
+              partner_gender: partnerProfile?.gender || null,
+              partner_country: partnerProfile?.country || null,
             }), {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             });

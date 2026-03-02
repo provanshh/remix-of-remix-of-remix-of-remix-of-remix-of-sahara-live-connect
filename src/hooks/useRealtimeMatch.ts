@@ -70,10 +70,10 @@ export function useRealtimeMatch(options: UseRealtimeMatchOptions = {}) {
         async (payload) => {
           const row = payload.new as any;
           if (row.status === "matched" && row.session_id && row.matched_with) {
-            // Get partner profile
+            // Get partner profile (actual location & gender)
             const { data: profile } = await supabase
               .from("profiles")
-              .select("username, avatar_url")
+              .select("username, avatar_url, gender, country")
               .eq("id", row.matched_with)
               .single();
 
@@ -82,6 +82,8 @@ export function useRealtimeMatch(options: UseRealtimeMatchOptions = {}) {
               partnerId: row.matched_with,
               partnerUsername: profile?.username || "Anonymous",
               partnerAvatar: profile?.avatar_url || undefined,
+              partnerGender: (profile as any)?.gender || undefined,
+              partnerCountry: (profile as any)?.country || undefined,
             };
 
             setMatchInfo(match);
