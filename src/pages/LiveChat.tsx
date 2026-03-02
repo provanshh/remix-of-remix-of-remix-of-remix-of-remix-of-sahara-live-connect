@@ -525,9 +525,14 @@ export default function LiveChat() {
                 </>
               ) : (
                 <>
-                  <p className="text-3xl font-display font-bold text-primary mb-1">{onlineCount.toLocaleString()}</p>
+                  {/* Pulsing rings */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-32 h-32 rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '2s' }} />
+                    <div className="absolute w-48 h-48 rounded-full border border-primary/10 animate-ping" style={{ animationDuration: '3s' }} />
+                  </div>
+                  <p className="text-3xl font-display font-bold text-primary mb-1 animate-pulse">{onlineCount.toLocaleString()}</p>
                   <p className="text-muted-foreground text-sm">+ Online</p>
-                  <p className="text-muted-foreground/60 text-xs mt-4">Searching{searchDots}</p>
+                  <p className="text-primary/60 text-sm font-medium mt-4 tracking-widest uppercase animate-pulse">Matching{searchDots}</p>
                 </>
               )}
             </div>
