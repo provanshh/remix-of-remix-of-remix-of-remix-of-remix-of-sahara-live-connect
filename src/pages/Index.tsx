@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Video, ChevronDown, ShoppingBag, Clock, Facebook, LogIn, Youtube } from "lucide-react";
+import { Video, ChevronDown, ShoppingBag, Clock, Facebook, LogIn, LogOut, Youtube } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ParticleBackground from "@/components/ParticleBackground";
 import StatsCounter from "@/components/StatsCounter";
@@ -9,6 +9,7 @@ import CoinShopModal from "@/components/CoinShopModal";
 import LandingInfoSection from "@/components/LandingInfoSection";
 import saharaLogo from "@/assets/sahara-logo.png";
 import { useOnlineMembers } from "@/hooks/useOnlineMembers";
+import { useAuth } from "@/contexts/AuthContext";
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
 import profile3 from "@/assets/profile-3.jpg";
@@ -49,6 +50,9 @@ export default function LandingPage() {
   const countryRef = useRef<HTMLDivElement>(null);
 
   const { members, onlineCount } = useOnlineMembers();
+  const { user, signOut } = useAuth();
+  const displayName = user?.user_metadata?.username || user?.email?.split("@")[0] || "User";
+  const firstLetter = displayName.charAt(0).toUpperCase();
 
   // Use static profiles for the carousel
   const carouselProfiles = STATIC_PROFILES;
@@ -126,10 +130,24 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:block w-px h-5 bg-border/30" />
-          <button onClick={() => navigate("/auth")} className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-white hover:text-primary hover:scale-105 transition-all duration-200">
-            <LogIn className="w-4 h-4" />
-            Log in
-          </button>
+          {user ? (
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                  {firstLetter}
+                </div>
+                <span className="text-sm font-medium text-foreground max-w-[120px] truncate">{displayName}</span>
+              </div>
+              <button onClick={signOut} className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:scale-105 transition-all duration-200">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => navigate("/auth")} className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-white hover:text-primary hover:scale-105 transition-all duration-200">
+              <LogIn className="w-4 h-4" />
+              Log in
+            </button>
+          )}
 
           <ThemeToggle />
         </div>
