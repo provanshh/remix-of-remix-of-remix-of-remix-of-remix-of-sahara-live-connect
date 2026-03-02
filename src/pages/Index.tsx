@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Video, ChevronDown, ShoppingBag, Clock, Facebook, LogIn, LogOut, Youtube } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -10,6 +10,16 @@ import LandingInfoSection from "@/components/LandingInfoSection";
 import saharaLogo from "@/assets/sahara-logo.png";
 import { useOnlineMembers } from "@/hooks/useOnlineMembers";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import profile1 from "@/assets/profile-1.jpg";
 import profile2 from "@/assets/profile-2.jpg";
 import profile3 from "@/assets/profile-3.jpg";
@@ -46,6 +56,7 @@ export default function LandingPage() {
   const [genderOpen, setGenderOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const genderRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
 
@@ -138,7 +149,7 @@ export default function LandingPage() {
                 </div>
                 <span className="text-sm font-medium text-foreground max-w-[120px] truncate">{displayName}</span>
               </div>
-              <button onClick={signOut} className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:scale-105 transition-all duration-200">
+              <button onClick={() => setLogoutConfirmOpen(true)} className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:scale-105 transition-all duration-200">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -245,6 +256,21 @@ export default function LandingPage() {
       </div>
       <LandingInfoSection />
       <CoinShopModal open={shopOpen} onClose={() => setShopOpen(false)} coinBalance={0} />
+
+      <AlertDialog open={logoutConfirmOpen} onOpenChange={setLogoutConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={signOut}>Log out</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
